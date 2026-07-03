@@ -22,6 +22,12 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const uid = await requireUserId();
+    const petCount = await prisma.pet.count({ where: { userId: uid } });
+    if (petCount >= 5) {
+      const err = new Error("目前仅支持添加 5 只宠物") as Error & { status?: number };
+      err.status = 409;
+      throw err;
+    }
     const body = await req.json();
     const data = petCreateSchema.parse(body);
     const pet = await prisma.pet.create({
@@ -31,6 +37,7 @@ export async function POST(req: Request) {
         species: data.species,
         ageMonths: data.ageMonths ?? null,
         sex: data.sex ?? "UNKNOWN",
+        photoUrl: data.photoUrl ?? null,
       },
     });
     await track("宠物档案_完成", uid, { species: pet.species, petId: pet.id });

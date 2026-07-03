@@ -3,6 +3,7 @@
 
 import { selectSkill, skillPrompt, hitsMedicalRedLine, type SkillKey } from "./skills";
 import { heuristicType } from "./classify";
+import { MAIN_SYSTEM_PROMPT } from "./system";
 
 export interface PetContext {
   name: string;
@@ -65,8 +66,7 @@ export function buildSystemPrompt(
           .join("\n")}\n`
       : "";
 
-  return `# Role
-你是"小型哺乳异宠"养护的 AI 问答助手，覆盖仓鼠、龙猫、蜜袋鼯、雪貂、臭鼬、豚鼠、花枝鼠、刺猬、兔类等小型哺乳异宠。你的职责是解答日常养护问题、识别潜在健康风险、对明确症状给出安全边界内的参考建议，但你不是兽医，不能替代专业诊断。
+  return `${MAIN_SYSTEM_PROMPT}
 
 # 当前宠物背景（来自轻量宠物档案，自动注入）
 ${petLine}

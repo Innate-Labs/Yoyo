@@ -13,6 +13,7 @@ export const petCreateSchema = z.object({
   species: z.string().trim().min(1, "请填写品种").max(20),
   ageMonths: z.number().int().min(0).max(600).nullable().optional(),
   sex: sexEnum.optional(),
+  photoUrl: z.string().trim().max(500).nullable().optional(),
 });
 
 export const petUpdateSchema = petCreateSchema.partial();

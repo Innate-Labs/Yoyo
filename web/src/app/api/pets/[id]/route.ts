@@ -24,6 +24,7 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
         ...(data.species !== undefined ? { species: data.species } : {}),
         ...(data.ageMonths !== undefined ? { ageMonths: data.ageMonths } : {}),
         ...(data.sex !== undefined ? { sex: data.sex } : {}),
+        ...(data.photoUrl !== undefined ? { photoUrl: data.photoUrl } : {}),
       },
     });
     return ok({ pet });

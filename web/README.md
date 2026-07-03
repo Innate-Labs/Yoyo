@@ -3,6 +3,8 @@
 聚焦哺乳异宠（雪貂为主）的 AI 问答工具。核心：AI 问答（三层判断 + 安全话术 + 高危提示）+ 资源地图。
 技术栈：Next.js 14（App Router，全栈）+ PostgreSQL + Prisma + Tailwind。
 
+前端已替换为 Yoyo 静态交付版，运行文件位于 `public/yoyo/`；Next.js 继续承载 API、鉴权、数据库和 AI Agent。
+
 > AI 回答为辅助参考，不替代执业兽医诊断。
 
 ## 功能概览
@@ -52,7 +54,7 @@ npm run db:seed          # 占位（RAG 为空实现，无需预置数据）
 
 ```bash
 npm run dev
-# 打开 http://localhost:3000
+# 打开 http://localhost:3000（自动进入 /yoyo/index.html）
 ```
 
 开发期登录：任意手机号 → 点"获取验证码" → 输入 `000000` → 登录。
@@ -88,12 +90,12 @@ npm run smoke:ai
 ```
 src/
   app/
-    login/ onboarding/ chat/     页面
+    page.tsx                      跳转到 Yoyo 前端
     api/                          路由：auth / pets / conversations / chat / upload / messages / vets
-  components/                     PetForm / VetMap / AnswerText
   lib/
-    ai/                           provider 适配层 + prompt + 三层解析 + classify(启发式) + skills(场景 Skill 路由) + rag(空实现)
-    db.ts session.ts sms.ts events.ts validators.ts api.ts client.ts
+    ai/                           主体 System Prompt + provider + 三层解析 + skills + rag(空实现)
+    db.ts session.ts sms.ts events.ts validators.ts api.ts
+public/yoyo/                      Yoyo HTML / CSS / JS / 视频前端
 prisma/  schema.prisma / seed.ts
 ```
 

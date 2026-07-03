@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "异宠AI问答",
-  description: "聚焦哺乳异宠（雪貂为主）的 AI 养护问答助手。AI 辅助参考，不替代执业兽医诊断。",
+  title: "Yoyo · 异宠 AI 养护助手",
+  description: "聚焦小型哺乳异宠的 AI 养护、行为与健康风险助手。",
 };
 
 export const viewport: Viewport = {

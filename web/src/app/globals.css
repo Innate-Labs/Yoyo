@@ -1,29 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  color-scheme: light;
-}
-
 html,
 body {
   height: 100%;
+  margin: 0;
 }
 
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
-}
-
-/* AI 回答中 markdown 风格的基础排版 */
-.answer-body {
-  @apply whitespace-pre-wrap leading-relaxed;
-}
-.answer-body strong {
-  @apply font-bold;
-}
-
-/* 高危提示块 */
-.high-risk {
-  @apply my-2 rounded-lg border-l-4 border-danger bg-danger-soft px-4 py-3 text-danger;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
 }

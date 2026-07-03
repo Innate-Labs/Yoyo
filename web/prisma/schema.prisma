@@ -14,6 +14,7 @@ datasource db {
 model User {
   id            String         @id @default(cuid())
   phone         String         @unique
+  name          String         @default("异宠用户")
   createdAt     DateTime       @default(now())
   pets          Pet[]
   conversations Conversation[]
@@ -37,6 +38,7 @@ model Pet {
   species       String // 品种：雪貂 / 仓鼠 / 龙猫 / 蜜袋鼯 等
   ageMonths     Int? // 年龄（月）
   sex           Sex            @default(UNKNOWN)
+  photoUrl      String?
   createdAt     DateTime       @default(now())
   conversations Conversation[]
 

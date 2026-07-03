@@ -1,0 +1,147 @@
+// 异宠AI问答 数据模型
+// 架构变更（2026-07-02）：砍 RAG，改为场景 Skill。rag_chunks 表保留为空实现接口，
+// 不再依赖 pgvector 向量列；未来若重新启用 RAG，再加回 embedding 列与扩展即可。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  phone         String         @unique
+  createdAt     DateTime       @default(now())
+  pets          Pet[]
+  conversations Conversation[]
+  feedbacks     Feedback[]
+  events        Event[]
+
+  @@map("users")
+}
+
+enum Sex {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+model Pet {
+  id            String         @id @default(cuid())
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name          String // 昵称
+  species       String // 品种：雪貂 / 仓鼠 / 龙猫 / 蜜袋鼯 等
+  ageMonths     Int? // 年龄（月）
+  sex           Sex            @default(UNKNOWN)
+  createdAt     DateTime       @default(now())
+  conversations Conversation[]
+
+  @@index([userId])
+  @@map("pets")
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  petId     String?
+  pet       Pet?      @relation(fields: [petId], references: [id], onDelete: SetNull)
+  title     String    @default("新对话")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  messages  Message[]
+
+  @@index([userId])
+  @@map("conversations")
+}
+
+enum Role {
+  USER
+  ASSISTANT
+}
+
+// AI 内部判定的三层类型（仅存储，不向用户展示标签）
+enum QuestionType {
+  DAILY_CARE // 日常养护类
+  BEHAVIOR_ANOMALY // 行为/外观异常类
+  SYMPTOM_DISEASE // 症状/疾病类
+  UNKNOWN
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           Role
+  content        String // 文本内容
+  imageUrl       String? // 用户上传图片（仅 user 消息）
+  questionType   QuestionType @default(UNKNOWN) // AI 判定，仅 assistant 消息有意义
+  isHighRisk     Boolean      @default(false) // 高危信号
+  createdAt      DateTime     @default(now())
+  feedbacks      Feedback[]
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+enum FeedbackKind {
+  UP
+  DOWN
+}
+
+model Feedback {
+  id        String       @id @default(cuid())
+  messageId String
+  message   Message      @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      FeedbackKind
+  createdAt DateTime     @default(now())
+
+  @@unique([messageId, userId]) // 一人对一条回答一个反馈
+  @@map("feedbacks")
+}
+
+// 埋点事件（PRD 4.3）
+model Event {
+  id        String   @id @default(cuid())
+  name      String // 注册_完成 / 问答_发起 / 高危提示_触发 ...
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  payload   Json? // 事件附加字段
+  createdAt DateTime @default(now())
+
+  @@index([name])
+  @@index([userId])
+  @@map("events")
+}
+
+// 短信验证码（用于登录）
+model SmsCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+  @@map("sms_codes")
+}
+
+// RAG 语料块（保留接口，当前为空实现，不走向量检索）。
+// 未来若重启 RAG：加回 embedding vector 列 + pgvector 扩展即可，调用方 retrieveChunks() 不变。
+model RagChunk {
+  id            String   @id @default(cuid())
+  content       String
+  source        String? // 来源
+  species       String? // 品种
+  healthRelated Boolean  @default(false) // 是否健康相关
+  createdAt     DateTime @default(now())
+
+  @@map("rag_chunks")
+}

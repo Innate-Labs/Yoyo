@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-label="YoYo hero poster">
+  <defs>
+    <filter id="noise" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="3" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncA type="table" tableValues="0 0.05"/>
+      </feComponentTransfer>
+    </filter>
+    <linearGradient id="scrim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F1F0F4" stop-opacity=".15"/>
+      <stop offset="1" stop-color="#F1F0F4" stop-opacity=".35"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="#F1F0F4"/>
+  <g opacity=".78">
+    <circle cx="360" cy="390" r="98" fill="#fff"/>
+    <circle cx="516" cy="374" r="112" fill="#fff"/>
+    <circle cx="690" cy="384" r="106" fill="#fff"/>
+    <circle cx="860" cy="378" r="118" fill="#fff"/>
+  </g>
+  <g fill="#C9C3F7">
+    <path d="M192 160l16 36 36 16-36 16-16 36-16-36-36-16 36-16z"/>
+    <path d="M1048 136l12 27 27 12-27 12-12 27-12-27-27-12 27-12z"/>
+    <path d="M1042 548l18 40 40 18-40 18-18 40-18-40-40-18 40-18z"/>
+  </g>
+  <text x="640" y="180" text-anchor="middle" font-family="Baloo 2, Fredoka, Arial Rounded MT Bold, sans-serif" font-size="118" font-weight="800" fill="#141414">Hi, I'm</text>
+  <text x="640" y="294" text-anchor="middle" font-family="Baloo 2, Fredoka, Arial Rounded MT Bold, sans-serif" font-size="132" font-weight="800" fill="#9D93F2">YoYo</text>
+  <text x="640" y="608" text-anchor="middle" font-family="PingFang SC, Microsoft YaHei, sans-serif" font-size="24" fill="#8A8A90">Loading a very serious website about a very playful crew.</text>
+  <rect width="1280" height="720" fill="url(#scrim)"/>
+  <rect width="1280" height="720" filter="url(#noise)" opacity=".65"/>
+</svg>

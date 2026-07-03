@@ -298,8 +298,13 @@
     state.selected = index;
     this.renderAll();
     const input = this.current()?.messages.length ? $("#chatInput") : $("#heroInput");
+    const question = input.value.replace(/^我想咨询「[^」]+」（[^）]*）：\s*/, "");
+    const info = [pet.species, pet.age, pet.sex].filter(Boolean).join("，");
+    const prefix = `我想咨询「${pet.name}」（${info}）：`;
+    input.value = prefix + question;
     input.placeholder = `问问关于 ${pet.name}（${pet.species}）的问题…`;
     input.focus();
+    input.setSelectionRange?.(prefix.length, prefix.length);
   };
 
   App.newChat = function newChat() {

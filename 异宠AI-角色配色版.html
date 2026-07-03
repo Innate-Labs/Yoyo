@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MochiCare · 角色配色版</title>
+  <style>
+    :root{
+      --cream:#fffaf0;
+      --cream-2:#f8f1e3;
+      --milk:#fffef9;
+      --ink:#29211c;
+      --muted:#806f62;
+      --honey:#f4b544;
+      --butter:#ffdda1;
+      --peach:#ffbe9f;
+      --mint:#dcecc9;
+      --sky:#c8e4ef;
+      --blue:#4f9fc1;
+      --lilac:#ddd2ee;
+      --red:#e86d63;
+      --line:rgba(41,33,28,.18);
+      --shadow:6px 6px 0 var(--ink);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{font-family:Inter,-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:var(--cream);-webkit-font-smoothing:antialiased}
+    button,input,textarea{font:inherit}button{cursor:pointer}
+    .display{font-family:"Arial Rounded MT Bold","Arial Black","PingFang SC",sans-serif;font-weight:900;letter-spacing:-.04em}
+    .screen{display:none}.screen.active{display:block}.hidden{display:none!important}
+    .btn{border:1.5px solid var(--ink);border-radius:999px;padding:11px 18px;font-size:11px;font-weight:850;transition:.18s transform,.18s box-shadow}
+    .btn:hover{transform:translateY(-2px)}
+
+    /* 首页：最新视频全屏播放 */
+    .video-home{height:100svh;min-height:620px;position:relative;overflow:hidden;background:var(--ink);color:var(--ink)}
+    .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .video-home:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(39,30,24,.24),transparent 35%,transparent 60%,rgba(39,30,24,.5));pointer-events:none}
+    .topbar{position:relative;z-index:2;height:92px;padding:0 32px;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;padding:8px 13px 8px 9px;background:rgba(255,250,240,.82);border:1.5px solid var(--ink);border-radius:999px;backdrop-filter:blur(14px);font-size:18px;box-shadow:3px 3px 0 var(--ink)}
+    .brand-mark{width:34px;height:34px;border:1.5px solid var(--ink);border-radius:50%;background:var(--honey);display:grid;place-items:center}
+    .top-actions{display:flex;gap:9px}
+    .login-btn{background:rgba(255,250,240,.86);backdrop-filter:blur(14px)}
+    .start-btn{background:var(--honey);box-shadow:3px 3px 0 var(--ink)}
+    .micro-label{position:absolute;z-index:2;top:39px;left:50%;transform:translateX(-50%);padding:7px 12px;border-radius:999px;background:rgba(255,250,240,.75);backdrop-filter:blur(12px);font-size:8px;letter-spacing:.16em;text-transform:uppercase}
+    .bottom{position:absolute;z-index:2;left:32px;right:32px;bottom:26px;display:flex;justify-content:space-between;align-items:end;gap:18px}
+    .status-card{display:flex;align-items:center;gap:12px;padding:11px 14px;border:1.5px solid var(--ink);border-radius:17px;background:rgba(255,250,240,.86);backdrop-filter:blur(14px);box-shadow:4px 4px 0 var(--ink)}
+    .status-dot{width:9px;height:9px;border-radius:50%;background:#7bc58f;box-shadow:0 0 0 5px rgba(123,197,143,.18)}
+    .status-card b{display:block;font-size:12px}.status-card small{display:block;margin-top:3px;color:var(--muted);font-size:8px}
+    .palette{display:flex;align-items:center;gap:7px;padding:8px 10px;border:1.5px solid var(--ink);border-radius:999px;background:rgba(255,250,240,.8);backdrop-filter:blur(12px)}
+    .swatch{width:16px;height:16px;border:1px solid rgba(41,33,28,.25);border-radius:50%}
+    .video-toggle{width:42px;height:42px;border:1.5px solid var(--ink);border-radius:50%;background:var(--sky);font-weight:900}
+
+    /* 弹窗 */
+    .mask{position:fixed;z-index:100;inset:0;display:grid;place-items:center;padding:18px;background:rgba(41,33,28,.46);backdrop-filter:blur(12px)}
+    .modal{width:min(460px,100%);max-height:90vh;overflow:auto;border:2px solid var(--ink);border-radius:28px;background:var(--cream);box-shadow:10px 10px 0 var(--ink)}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:22px 23px 0}.modal-head h2{margin:0;font-size:28px}
+    .close{width:37px;height:37px;border:1px solid var(--line);border-radius:50%;background:var(--milk);font-size:18px}
+    .modal-body{padding:17px 23px 24px}.lead{margin:0 0 16px;color:var(--muted);font-size:11px;line-height:1.7}
+    .field{margin-top:12px}.field label{display:block;margin-bottom:6px;font-size:9px;font-weight:850}
+    .input{width:100%;padding:12px 13px;border:1.5px solid var(--line);border-radius:14px;background:var(--milk);outline:0}.input:focus{border-color:var(--honey);box-shadow:0 0 0 3px rgba(244,181,68,.22)}
+    .row{display:flex;gap:8px}.row .input{flex:1}.code{border:1.5px solid var(--ink);border-radius:14px;background:var(--butter);padding:0 12px;font-size:9px;font-weight:850;white-space:nowrap}
+    .hint{margin-top:7px;color:#a36b13;font-size:9px}.error{margin-top:7px;color:var(--red);font-size:9px}.submit{width:100%;margin-top:17px;background:var(--honey);box-shadow:3px 3px 0 var(--ink)}
+    .skip{border:0;background:transparent;color:var(--muted);font-size:9px}
+    .chips{display:flex;flex-wrap:wrap;gap:7px}.chip{padding:8px 11px;border:1px solid var(--line);border-radius:999px;background:var(--milk);font-size:9px;font-weight:750}.chip.on{border-color:var(--ink);background:var(--mint);box-shadow:2px 2px 0 var(--ink)}
+    .risk-note{padding:10px;border:1px solid var(--red);border-radius:12px;background:#ffe6df;font-size:9px;line-height:1.5}
+    .vet{padding:13px 0;border-bottom:1px solid var(--line)}.vet:last-child{border:0}.vet-name{display:flex;justify-content:space-between;gap:12px;font-size:11px;font-weight:850}.vet p{margin:6px 0;color:var(--muted);font-size:9px}.vet a{color:#347f9e;font-size:9px}
+
+    /* 产品内部 */
+    .app{height:100svh;padding:12px;display:grid;grid-template-columns:278px 1fr;gap:12px;background:var(--cream-2)}
+    .sidebar{min-height:0;padding:16px;display:flex;flex-direction:column;border:2px solid var(--ink);border-radius:26px;background:var(--butter);box-shadow:var(--shadow)}
+    .side-brand{display:flex;align-items:center;gap:9px;padding:2px 2px 16px;font-size:19px}.side-brand .brand-mark{width:31px;height:31px;background:var(--milk)}
+    .profile{display:flex;align-items:center;gap:9px;padding:10px;border:1.5px solid var(--ink);border-radius:16px;background:var(--milk)}
+    .avatar{width:37px;height:37px;border:1.5px solid var(--ink);border-radius:13px;background:var(--peach);display:grid;place-items:center;font-weight:900}
+    .profile-text{flex:1}.profile-text b{display:block;font-size:10px}.profile-text span{color:var(--muted);font-size:8px}
+    .new-chat{width:100%;margin-top:12px;padding:11px;border:1.5px solid var(--ink);border-radius:14px;background:var(--honey);box-shadow:3px 3px 0 var(--ink);font-size:10px;font-weight:900}
+    .side-label{margin:23px 5px 7px;color:var(--muted);font-size:7px;letter-spacing:.16em;text-transform:uppercase}
+    .history{flex:1;min-height:0;overflow:auto}.history-item{margin:3px 0;padding:9px;border:1px solid transparent;border-radius:11px;color:#765f4e;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}.history-item:hover,.history-item.on{border-color:var(--ink);background:var(--milk);color:var(--ink)}
+    .side-foot{padding-top:10px;border-top:1px solid rgba(41,33,28,.2);display:grid}.side-link{padding:7px 4px;border:0;background:transparent;text-align:left;color:#765f4e;font-size:9px}
+    .workspace{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;border:2px solid var(--ink);border-radius:26px;background:var(--cream);position:relative}
+    .workspace:after{content:"";position:absolute;z-index:0;width:230px;height:230px;right:-95px;top:110px;border-radius:50%;background:var(--mint);opacity:.42;pointer-events:none}
+    .appbar,.pets,.welcome,.chat{position:relative;z-index:1}
+    .appbar{height:63px;flex:0 0 auto;padding:0 21px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+    .app-title{font-size:10px;font-weight:850}.outline-btn{padding:8px 12px;border:1.5px solid var(--ink);border-radius:999px;background:var(--sky);font-size:8px;font-weight:850}.menu{display:none;border:0;background:transparent;font-size:18px}
+    .pets{padding:12px 21px 4px;display:flex;gap:8px;overflow-x:auto}.pet{flex:0 0 auto;padding:7px 10px 7px 7px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:15px;background:var(--milk)}.pet.on{border-color:var(--ink);box-shadow:3px 3px 0 var(--mint)}.pet-icon{width:31px;height:31px;border-radius:10px;background:var(--sky);display:grid;place-items:center;font-size:15px}.pet b{display:block;font-size:9px}.pet small{display:block;color:var(--muted);font-size:7px}.add-pet{width:44px;flex:0 0 auto;border:1px dashed var(--muted);border-radius:15px;background:transparent;font-size:17px}
+    .welcome{flex:1;min-height:0;padding:21px;display:grid;place-items:center}.welcome-inner{width:min(740px,100%);text-align:center}.welcome-mark{width:55px;height:55px;margin:auto;border:2px solid var(--ink);border-radius:20px 20px 16px 16px;background:var(--honey);box-shadow:4px 4px 0 var(--ink);display:grid;place-items:center;font-size:24px;transform:rotate(-4deg)}
+    .welcome h1{margin:23px 0 9px;font-size:clamp(43px,6vw,74px);line-height:.9}.welcome h1 span{color:var(--blue)}.welcome p{margin:0 0 22px;color:var(--muted);font-size:9px}
+    .ask{max-width:680px;margin:auto;padding:9px;border:2px solid var(--ink);border-radius:21px;background:var(--milk);box-shadow:5px 5px 0 var(--peach);text-align:left}.ask textarea{width:100%;min-height:62px;padding:9px;border:0;outline:0;resize:none;background:transparent;line-height:1.5}.ask-foot{display:flex;align-items:center;justify-content:space-between}.round{width:35px;height:35px;border:1px solid var(--line);border-radius:50%;background:var(--mint)}.send{padding:9px 15px;border:1.5px solid var(--ink);border-radius:999px;background:var(--honey);font-size:9px;font-weight:850}
+    .suggestions{margin-top:16px;display:flex;justify-content:center;flex-wrap:wrap;gap:7px}.suggest{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(255,254,249,.7);color:var(--muted);font-size:8px}.suggest:hover{border-color:var(--ink);background:var(--mint);color:var(--ink)}
+    .preview{display:flex;align-items:center;gap:8px;padding:3px 5px 8px;color:var(--muted);font-size:8px}.preview img{width:42px;height:42px;border-radius:10px;object-fit:cover}.preview button{border:0;background:transparent;color:var(--red);font-size:8px}
+    .chat{display:none;flex:1;min-height:0;flex-direction:column}.chat.show{display:flex}.messages{flex:1;min-height:0;padding:24px;overflow:auto}.messages-inner{width:min(740px,100%);margin:auto;display:grid;gap:19px}.message{display:flex;align-items:flex-start;gap:9px}.message.user{flex-direction:row-reverse}.msg-avatar{width:33px;height:33px;flex:0 0 auto;border:1.5px solid var(--ink);border-radius:11px;background:var(--milk);display:grid;place-items:center;font-size:14px}.message.user .msg-avatar{background:var(--peach);font-size:8px;font-weight:900}.bubble{max-width:76%;padding:11px 13px;border:1px solid var(--line);border-radius:16px 16px 16px 5px;background:var(--milk);font-size:10px;line-height:1.75}.message.user .bubble{border-color:var(--ink);border-radius:16px 5px 16px 16px;background:var(--blue);color:#fff;white-space:pre-wrap}.bubble p{margin:0 0 7px}.bubble p:last-child{margin:0}.bubble img{display:block;max-width:220px;max-height:165px;margin-bottom:7px;border-radius:10px;object-fit:cover}.high-risk{margin-bottom:7px;padding:9px;border:1px solid var(--red);border-radius:10px;background:#ffe6df;color:#9e302b;font-weight:900}.map-entry{margin-top:7px;padding:8px 10px;border:1px solid var(--ink);border-radius:999px;background:var(--peach);font-size:8px;font-weight:850}
+    .composer{padding:11px 21px 16px;border-top:1px solid var(--line)}.composer-inner{width:min(740px,100%);margin:auto;display:flex;align-items:end;gap:7px}.composer textarea{flex:1;padding:10px 11px;border:1px solid var(--line);border-radius:14px;background:var(--milk);outline:0;resize:none}.composer textarea:focus{border-color:var(--honey)}
+    .toast{position:fixed;z-index:130;left:50%;bottom:24px;transform:translateX(-50%);padding:10px 14px;border:1px solid var(--ink);border-radius:999px;background:var(--honey);box-shadow:3px 3px 0 var(--ink);font-size:9px;font-weight:800}
+    @media(max-width:760px){
+      .video-home{min-height:560px}.topbar{height:76px;padding:0 15px}.brand{font-size:16px;padding:6px 10px 6px 7px}.brand-mark{width:30px;height:30px}.micro-label{display:none}.btn{padding:9px 12px;font-size:9px}.bottom{left:15px;right:15px;bottom:17px}.status-card small,.palette{display:none}
+      .app{grid-template-columns:1fr;padding:7px}.sidebar{position:fixed;z-index:60;inset:7px auto 7px 7px;width:268px;transform:translateX(-110%);transition:.22s}.sidebar.open{transform:none}.workspace{border-radius:20px}.menu{display:block}.appbar{padding:0 13px}.pets{padding:10px 13px 4px}.welcome{padding:14px}.welcome h1{font-size:46px}.messages{padding:17px 11px}.composer{padding:9px 11px 12px}.bubble{max-width:86%}
+    }
+  </style>
+</head>
+<body>
+  <section class="screen active" id="landing">
+    <main class="video-home">
+      <video class="hero-video" id="heroVideo" autoplay muted loop playsinline>
+        <source src="./最新版视频.mp4" type="video/mp4">
+      </video>
+      <header class="topbar">
+        <div class="brand display"><span class="brand-mark">🐾</span>MochiCare</div>
+        <span class="micro-label">Care for every tiny friend</span>
+        <div class="top-actions"><button class="btn login-btn" onclick="App.openAuth()">登录</button><button class="btn start-btn" onclick="App.openAuth()">开始提问&nbsp; ↗</button></div>
+      </header>
+      <footer class="bottom">
+        <div class="status-card"><span class="status-dot"></span><div><b>异宠 AI 养护助手</b><small>日常问答 · 风险提醒 · 附近医院</small></div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="palette" aria-label="页面配色"><i class="swatch" style="background:var(--honey)"></i><i class="swatch" style="background:var(--peach)"></i><i class="swatch" style="background:var(--mint)"></i><i class="swatch" style="background:var(--sky)"></i><i class="swatch" style="background:var(--lilac)"></i></div>
+          <button class="video-toggle" id="videoToggle" onclick="App.toggleVideo()" aria-label="暂停或播放">Ⅱ</button>
+        </div>
+      </footer>
+    </main>
+  </section>
+
+  <section class="screen" id="inside">
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="side-brand display"><span class="brand-mark">🐾</span>MochiCare</div>
+        <div class="profile"><div class="avatar">异</div><div class="profile-text"><b>异宠用户</b><span id="userPhone">188****0000</span></div><span>›</span></div>
+        <button class="new-chat" onclick="App.newChat()">＋ 新对话</button>
+        <div class="side-label">Recent chats</div><div class="history" id="history"></div>
+        <div class="side-foot"><button class="side-link" onclick="App.openMap('manual')">📍 资源地图</button><button class="side-link" onclick="App.goHome()">↙ 返回首页</button></div>
+      </aside>
+      <main class="workspace">
+        <header class="appbar"><div style="display:flex;align-items:center;gap:8px"><button class="menu" onclick="App.toggleSidebar()">☰</button><span class="app-title">MOCHI AI / 异宠养护助手</span></div><button class="outline-btn" onclick="App.openMap('manual')">附近医院&nbsp; ↗</button></header>
+        <div class="pets" id="pets"></div>
+        <section class="welcome" id="welcome"><div class="welcome-inner">
+          <div class="welcome-mark">🐾</div><h1 class="display">今天想问<br><span>什么小问题？</span></h1><p id="welcomeText">喂食、环境、行为，或它最近不太寻常的小变化。</p>
+          <div class="ask"><textarea id="heroInput" rows="2" placeholder="比如：我家雪貂最近老掉毛，还特别爱咬东西…"></textarea><div class="ask-foot"><button class="round" onclick="App.pickImage()" title="上传图片">⌁</button><button class="send" onclick="App.send('hero')">发送&nbsp; ↑</button></div></div>
+          <div class="suggestions" id="suggestions"></div>
+        </div></section>
+        <section class="chat" id="chat"><div class="messages" id="messages"><div class="messages-inner" id="messagesInner"></div></div><div class="composer"><div class="composer-inner"><button class="round" onclick="App.pickImage()">⌁</button><textarea id="chatInput" rows="1" placeholder="继续追问…"></textarea><button class="send" onclick="App.send('chat')">发送&nbsp; ↑</button></div></div></section>
+      </main>
+    </div>
+  </section>
+  <div id="modalMount"></div><div id="toastMount"></div>
+  <script>
+    const $=s=>document.querySelector(s),esc=s=>String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+    const SPECIES=[["雪貂","🦦"],["龙猫","🐭"],["兔兔","🐰"],["蜜袋鼯","🐿️"],["其他","🐾"]],SUGGEST=["雪貂一天喂几次？","笼子和垫材怎么选？","最近老掉毛，还爱咬东西","突然抽搐，叫不醒"];
+    const EMERGENCY=["抽搐","痉挛","出血","呼吸困难","昏迷","瘫痪","中毒","持续呕吐","休克"],ANOMALY=["掉毛","脱毛","变瘦","亢奋","爱咬","嗜睡","发抖","无力"];
+    const VETS=[["毛球动物医院 · 中心店","0.8 km","示例市元气路 18 号","010-00000000"],["24H 小动物急诊","2.3 km","示例市月光大道 66 号","010-11111111"],["奇妙异宠诊所","3.6 km","示例市森林街 5 号","010-22222222"]];
+    const state={phone:"188****0000",pets:[],selected:0,chats:[],active:null,streaming:false,prompted:false,pendingImage:null};let seed=1;const uid=()=>`id${seed++}`;
+    function answerFor(text){
+      if(EMERGENCY.some(k=>text.includes(k)))return{high:true,text:"**请立即就医**\n你描述的情况可能属于紧急状况，请尽快带它前往能接诊异宠的宠物医院。\n\n出发前保持安静和温暖，不要强行喂食或自行用药；如果方便，记录症状开始时间并拍下短视频。\n\n本回答为 AI 辅助参考，不替代执业兽医诊断。"};
+      if(ANOMALY.some(k=>text.includes(k)))return{high:false,text:"这些变化值得留意。对雪貂来说，掉毛和异常亢奋有时可能与季节换毛、压力或肾上腺相关问题有关，不能只凭一条描述判断。\n\n建议记录掉毛位置、持续时间、食欲和体重变化；若出现对称性脱毛或持续加重，请预约能看异宠的兽医。"};
+      return{high:false,text:"可以先从饮食、环境温湿度和近期活动量三个方面检查。\n\n如果你愿意，可以继续告诉我它的品种、年龄和具体表现，我会帮你把建议缩小到更实用的范围。"};
+    }
+    const App={
+      show(id){document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$(id).classList.add("active")},
+      toggleVideo(){const v=$("#heroVideo"),b=$("#videoToggle");if(v.paused){v.play();b.textContent="Ⅱ"}else{v.pause();b.textContent="▶"}},
+      openAuth(){$("#modalMount").innerHTML=`<div class="mask" onclick="if(event.target===this)App.closeModal()"><div class="modal"><div class="modal-head"><h2 class="display">欢迎回来</h2><button class="close" onclick="App.closeModal()">×</button></div><div class="modal-body"><p class="lead">登录后，Mochi 才能记住你和小家伙的档案。未注册手机号会自动创建账号。</p><div class="field"><label>手机号</label><input id="phone" class="input" value="18800000000" maxlength="11" inputmode="numeric"></div><div class="field"><label>验证码</label><div class="row"><input id="codeInput" class="input" placeholder="输入 000000" maxlength="6" inputmode="numeric"><button class="code" onclick="App.sendCode(this)">获取验证码</button></div></div><div class="hint">演示验证码：000000</div><div id="authError" class="error hidden"></div><button class="btn submit" onclick="App.login()">进入 MochiCare&nbsp; ↗</button></div></div></div>`;setTimeout(()=>$("#codeInput").focus(),60)},
+      sendCode(b){b.textContent="已发送 · 60s";b.disabled=true;this.toast("验证码已发送 · 000000")},
+      login(){const p=$("#phone").value.trim(),c=$("#codeInput").value.trim();if(!/^1[3-9]\d{9}$/.test(p)||c!=="000000"){const e=$("#authError");e.classList.remove("hidden");e.textContent="请输入有效手机号和演示验证码 000000";return}state.phone=p.slice(0,3)+"****"+p.slice(7);$("#userPhone").textContent=state.phone;this.closeModal();this.show("#inside");this.renderAll();if(!state.prompted){state.prompted=true;setTimeout(()=>this.openPet(true),220)}},
+      goHome(){this.closeSidebar();this.show("#landing")},closeModal(){$("#modalMount").innerHTML=""},
+      openPet(first=false){if(state.pets.length>=5){this.toast("暂时最多支持 5 只宠物");return}$("#modalMount").innerHTML=`<div class="mask" onclick="if(event.target===this)App.closeModal()"><div class="modal"><div class="modal-head"><h2 class="display">${first?"认识一下小家伙":"添加小伙伴"}</h2><button class="skip" onclick="App.closeModal()">${first?"暂不填写":"关闭"}</button></div><div class="modal-body"><p class="lead">填一次，之后提问会自动带上它的背景信息。</p><div class="field"><label>昵称</label><input id="petName" class="input" placeholder="比如：十一"></div><div class="field"><label>品种</label><div class="chips" id="species">${SPECIES.map((s,i)=>`<button class="chip ${i===0?"on":""}" data-name="${s[0]}" data-icon="${s[1]}" onclick="App.pickChip(this)">${s[1]} ${s[0]}</button>`).join("")}</div></div><div class="field"><label>年龄（可选）</label><input id="petAge" class="input" placeholder="比如：8 个月"></div><div class="field"><label>性别</label><div class="chips" id="sex"><button class="chip on" data-value="未知" onclick="App.pickChip(this)">未知</button><button class="chip" data-value="公" onclick="App.pickChip(this)">公</button><button class="chip" data-value="母" onclick="App.pickChip(this)">母</button></div></div><div id="petError" class="error hidden"></div><button class="btn submit" onclick="App.savePet()">保存宠物档案&nbsp; 🐾</button></div></div></div>`},
+      pickChip(el){el.parentElement.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));el.classList.add("on")},
+      savePet(){const n=$("#petName").value.trim();if(!n){$("#petError").classList.remove("hidden");$("#petError").textContent="请先填写昵称";return}const sp=$("#species .on"),sx=$("#sex .on");state.pets.push({name:n,species:sp.dataset.name,icon:sp.dataset.icon,age:$("#petAge").value.trim()||"年龄未知",sex:sx.dataset.value});state.selected=state.pets.length-1;this.closeModal();this.renderPets();this.toast(`${n} 的档案保存好了`)},
+      renderAll(){this.renderPets();this.renderHistory();this.renderSuggestions();this.renderMessages();this.updateView()},
+      renderPets(){$("#pets").innerHTML=state.pets.map((p,i)=>`<button class="pet ${i===state.selected?"on":""}" onclick="App.selectPet(${i})"><span class="pet-icon">${p.icon}</span><span><b>${esc(p.name)}</b><small>${esc(p.species)} · ${esc(p.age)}</small></span></button>`).join("")+`<button class="add-pet" onclick="App.openPet()">＋</button>`;$("#welcomeText").textContent=state.pets.length?`已带上「${state.pets[state.selected].name}」的档案，直接描述问题就好。`:"喂食、环境、行为，或它最近不太寻常的小变化。"},
+      selectPet(i){state.selected=i;this.renderPets();const p=state.pets[i],input=this.current()?.messages.length?$("#chatInput"):$("#heroInput");input.placeholder=`问问关于 ${p.name}（${p.species}）的问题…`;input.focus()},
+      renderSuggestions(){$("#suggestions").innerHTML=SUGGEST.map(q=>`<button class="suggest" onclick="App.send('hero','${q}')">${q}</button>`).join("")},
+      current(){return state.chats.find(c=>c.id===state.active)},newChat(){state.active=null;state.pendingImage=null;this.renderAll();this.renderPreview();this.closeSidebar();$("#heroInput").value=""},openChat(id){state.active=id;this.renderAll();this.closeSidebar()},
+      renderHistory(){$("#history").innerHTML=state.chats.length?state.chats.map(c=>`<div class="history-item ${c.id===state.active?"on":""}" onclick="App.openChat('${c.id}')">${esc(c.title)}</div>`).join(""):`<div class="history-item" style="opacity:.55">还没有对话</div>`},
+      updateView(){const started=this.current()?.messages.length;$("#welcome").classList.toggle("hidden",!!started);$("#chat").classList.toggle("show",!!started)},
+      send(where,preset){if(state.streaming)return;const input=where==="hero"?$("#heroInput"):$("#chatInput"),text=String(preset??input.value).trim();if(!text&&!state.pendingImage)return;let c=this.current();if(!c){c={id:uid(),title:text.slice(0,22)||"图片提问",messages:[]};state.chats.unshift(c);state.active=c.id}const p=state.pets[state.selected],context=p?`[${p.name} · ${p.species} · ${p.age} · ${p.sex}] `:"";c.messages.push({role:"user",text:text||"请帮我看看这张图片",context,image:state.pendingImage});input.value="";state.pendingImage=null;this.renderPreview();this.renderHistory();this.updateView();this.renderMessages();const r=answerFor(text||"图片"),m={role:"ai",text:"",high:r.high};c.messages.push(m);state.streaming=true;let i=0;const t=setInterval(()=>{i=Math.min(r.text.length,i+4);m.text=r.text.slice(0,i);this.renderMessages();if(i>=r.text.length){clearInterval(t);state.streaming=false;this.renderMessages();if(r.high)setTimeout(()=>this.openMap("high"),380)}},18)},
+      renderMessages(){const c=this.current();if(!c){$("#messagesInner").innerHTML="";return}$("#messagesInner").innerHTML=c.messages.map(m=>{if(m.role==="user")return`<div class="message user"><div class="msg-avatar">我</div><div class="bubble">${m.image?`<img src="${m.image}" alt="用户上传图片">`:""}${m.context?`<span style="display:block;color:#d9f0fa;font-size:7px;margin-bottom:4px">${esc(m.context)}</span>`:""}${esc(m.text)}</div></div>`;const body=m.text.split("\n").map(line=>{const safe=esc(line).replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");return/请立即就医/.test(line)?`<div class="high-risk">${safe}</div>`:`<p>${safe||"&nbsp;"}</p>`}).join("");return`<div class="message ai"><div class="msg-avatar">🐾</div><div class="bubble">${body}${m.high?`<button class="map-entry" onclick="App.openMap('high')">📍 查看附近医院</button>`:""}</div></div>`}).join("");const b=$("#messages");b.scrollTop=b.scrollHeight},
+      pickImage(){const i=document.createElement("input");i.type="file";i.accept="image/jpeg,image/png,image/webp";i.onchange=()=>{const f=i.files?.[0];if(!f)return;if(f.size>10*1024*1024){this.toast("图片不能超过 10MB");return}state.pendingImage=URL.createObjectURL(f);this.renderPreview();this.toast("图片已添加")};i.click()},
+      renderPreview(){document.querySelectorAll(".preview").forEach(x=>x.remove());if(!state.pendingImage)return;const h=`<div class="preview"><img src="${state.pendingImage}" alt="待发送图片"><span>图片已准备好</span><button onclick="App.clearImage()">移除</button></div>`;$(".ask-foot")?.insertAdjacentHTML("beforebegin",h);$(".composer-inner")?.insertAdjacentHTML("beforebegin",h)},clearImage(){state.pendingImage=null;this.renderPreview()},
+      openMap(source){$("#modalMount").innerHTML=`<div class="mask" onclick="if(event.target===this)App.closeModal()"><div class="modal"><div class="modal-head"><h2 class="display">附近医院</h2><button class="close" onclick="App.closeModal()">×</button></div><div class="modal-body">${source==="high"?`<div class="risk-note"><b>检测到高危描述</b><br>请优先联系医院并尽快出发。</div>`:""}<p class="lead" style="margin-top:12px">以下为演示数据。出发前请电话确认能否接诊异宠。</p>${VETS.map(v=>`<div class="vet"><div class="vet-name"><span>${v[0]}</span><span>${v[1]}</span></div><p>${v[2]}</p><a href="tel:${v[3]}">致电 ${v[3]} ↗</a></div>`).join("")}</div></div></div>`},
+      toggleSidebar(){$("#sidebar").classList.toggle("open")},closeSidebar(){$("#sidebar").classList.remove("open")},toast(text){$("#toastMount").innerHTML=`<div class="toast">${esc(text)}</div>`;clearTimeout(this.toastTimer);this.toastTimer=setTimeout(()=>$("#toastMount").innerHTML="",2100)}
+    };
+    document.addEventListener("keydown",e=>{if(e.key==="Escape")App.closeModal();if(e.key==="Enter"&&!e.shiftKey){if(document.activeElement?.id==="heroInput"){e.preventDefault();App.send("hero")}if(document.activeElement?.id==="chatInput"){e.preventDefault();App.send("chat")}}});
+    window.addEventListener("load",()=>App.renderSuggestions());
+  </script>
+</body>
+</html>

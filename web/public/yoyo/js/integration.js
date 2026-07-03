@@ -277,6 +277,65 @@
     }
   };
 
+  App.confirmDeletePet = function confirmDeletePet(index) {
+    const pet = state.pets[index];
+    if (!pet) return;
+    document.querySelector("#deleteConfirmLayer")?.remove();
+    $("#modalMount").insertAdjacentHTML(
+      "beforeend",
+      `
+        <div id="deleteConfirmLayer" class="mask delete-confirm-layer"
+             onclick="if(event.target===this)App.closeDeleteConfirm()">
+          <div class="modal delete-confirm-modal">
+            <div class="modal-head">
+              <h2 class="display">删除宠物档案</h2>
+              <button class="close" onclick="App.closeDeleteConfirm()">×</button>
+            </div>
+            <div class="modal-body">
+              <p class="lead">
+                确定删除 <span class="delete-confirm-name">「${esc(pet.name)}」</span> 吗？
+                删除后将无法恢复，历史对话会保留。
+              </p>
+              <div id="deletePetError" class="error hidden"></div>
+              <div class="delete-confirm-actions">
+                <button class="delete-confirm-cancel" onclick="App.closeDeleteConfirm()">取消</button>
+                <button class="delete-confirm-submit" onclick="App.deletePet(${index}, this)">确认删除</button>
+              </div>
+            </div>
+          </div>
+        </div>`
+    );
+  };
+
+  App.closeDeleteConfirm = function closeDeleteConfirm() {
+    document.querySelector("#deleteConfirmLayer")?.remove();
+  };
+
+  App.deletePet = async function deletePet(index, button) {
+    const pet = state.pets[index];
+    if (!pet) return;
+    const error = $("#deletePetError");
+    setBusy(button, true, "删除中…");
+    error.classList.add("hidden");
+    try {
+      await services.pets.remove(pet.id);
+      state.pets.splice(index, 1);
+      state.chats.forEach((chat) => {
+        if (chat.petId === pet.id) chat.petId = null;
+      });
+      state.selected = Math.min(state.selected, Math.max(0, state.pets.length - 1));
+      state.editingPet = null;
+      this.closeDeleteConfirm();
+      this.closeModal();
+      this.renderAll();
+      this.toast(`${pet.name} 的档案已删除`);
+    } catch (errorValue) {
+      setBusy(button, false);
+      error.textContent = errorValue.message;
+      error.classList.remove("hidden");
+    }
+  };
+
   App.selectPet = function selectPet(index) {
     const nextPet = state.pets[index];
     const chat = this.current();

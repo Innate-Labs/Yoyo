@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>异宠AI问答 · 演示预览</title>
+<style>
+  :root {
+    --brand: #6d5efc;
+    --brand-2: #8b7ffc;
+    --brand-soft: #eef0ff;
+    --danger: #e5484d;
+    --danger-soft: #ffefef;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-900: #111827;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea { font-family: inherit; }
+
+  /* ===== 演示横幅 ===== */
+  .demo-banner {
+    background: #1f2937; color: #fff; font-size: 12px;
+    padding: 6px 16px; text-align: center;
+  }
+  .demo-banner b { color: #fbbf24; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ============ 官网落地页 ============ */
+  .landing { min-height: calc(100vh - 30px); display: flex; flex-direction: column; background:
+    radial-gradient(1200px 500px at 80% -10%, #efeaff 0%, rgba(255,255,255,0) 60%),
+    radial-gradient(900px 500px at 0% 110%, #eaf3ff 0%, rgba(255,255,255,0) 55%), #fff; }
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 32px; max-width: 1120px; margin: 0 auto; width: 100%;
+  }
+  .brand-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; }
+  .brand-logo .dot { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg,var(--brand),var(--brand-2)); display: grid; place-items: center; font-size: 15px; }
+  .nav-links { display: flex; align-items: center; gap: 24px; font-size: 14px; color: var(--gray-600); }
+  .nav-links a { color: inherit; text-decoration: none; }
+  .nav-links a:hover { color: var(--brand); }
+  .nav-cta { display: flex; gap: 10px; }
+  .nav-cta .ghost { background: #fff; border: 1px solid var(--gray-200); color: var(--gray-700); border-radius: 8px; padding: 8px 16px; font-size: 14px; }
+  .nav-cta .solid { background: var(--brand); border: none; color: #fff; border-radius: 8px; padding: 8px 18px; font-size: 14px; font-weight: 500; }
+
+  .hero { max-width: 1120px; margin: 0 auto; width: 100%; padding: 60px 32px 40px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .hero .tag { display: inline-block; background: var(--brand-soft); color: var(--brand); font-size: 12px; padding: 5px 12px; border-radius: 999px; }
+  .hero h1 { font-size: 40px; line-height: 1.25; margin-top: 16px; letter-spacing: -.5px; }
+  .hero h1 .hl { background: linear-gradient(120deg,var(--brand),var(--brand-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.lead { color: var(--gray-500); font-size: 16px; line-height: 1.8; margin-top: 18px; max-width: 480px; }
+  .hero .hero-cta { margin-top: 28px; display: flex; gap: 12px; }
+  .hero .hero-cta .primary { background: var(--brand); border: none; color: #fff; padding: 13px 26px; border-radius: 10px; font-size: 15px; font-weight: 500; }
+  .hero .hero-cta .second { background: #fff; border: 1px solid var(--gray-200); color: var(--gray-700); padding: 13px 22px; border-radius: 10px; font-size: 15px; }
+  .hero .trust { margin-top: 20px; font-size: 12px; color: var(--gray-400); }
+
+  .hero-card {
+    background: #fff; border: 1px solid var(--gray-100); border-radius: 20px; padding: 18px;
+    box-shadow: 0 20px 50px -20px rgba(109,94,252,.35);
+  }
+  .hero-card .mini-bar { display: flex; gap: 6px; margin-bottom: 12px; }
+  .hero-card .mini-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--gray-200); display: inline-block; }
+  .hc-msg { border-radius: 12px; padding: 10px 12px; font-size: 13px; line-height: 1.6; margin-bottom: 8px; max-width: 85%; }
+  .hc-msg.u { background: var(--brand); color: #fff; margin-left: auto; border-top-right-radius: 3px; }
+  .hc-msg.a { background: var(--gray-100); color: var(--gray-700); border-top-left-radius: 3px; }
+  .hc-risk { border-left: 3px solid var(--danger); background: var(--danger-soft); color: var(--danger); font-weight: 700; padding: 8px 10px; border-radius: 8px; font-size: 12px; margin-top: 4px; }
+
+  .features { max-width: 1120px; margin: 0 auto; width: 100%; padding: 20px 32px 60px; display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+  .feat { background: #fff; border: 1px solid var(--gray-100); border-radius: 14px; padding: 20px; }
+  .feat .ic { font-size: 22px; }
+  .feat h3 { font-size: 15px; margin-top: 10px; }
+  .feat p { font-size: 13px; color: var(--gray-500); line-height: 1.7; margin-top: 6px; }
+  .landing-foot { text-align: center; padding: 20px; font-size: 12px; color: var(--gray-400); border-top: 1px solid var(--gray-100); }
+
+  @media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; }
+    .features { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+
+  /* ============ 通用弹窗 ============ */
+  .modal-mask { position: fixed; inset: 0; background: rgba(17,24,39,.45); display: flex; align-items: center; justify-content: center; z-index: 60; padding: 16px; }
+  .modal { width: 100%; max-width: 400px; background: #fff; border-radius: 18px; overflow: hidden; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 30px 60px -20px rgba(0,0,0,.4); }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px 8px; }
+  .modal-head h3 { font-size: 18px; }
+  .modal-head .x { background: none; border: none; color: var(--gray-400); font-size: 20px; line-height: 1; }
+  .modal-head .skip-top { background: none; border: none; color: var(--gray-400); font-size: 13px; padding: 4px 6px; }
+  .modal-head .skip-top:hover { color: var(--gray-600); }
+  .modal-body { padding: 8px 22px 24px; overflow-y: auto; }
+  .modal-sub { font-size: 13px; color: var(--gray-500); line-height: 1.6; }
+
+  .field { margin-top: 12px; }
+  label.lbl { font-size: 13px; color: var(--gray-600); }
+  .inp { width: 100%; border: 1px solid var(--gray-200); border-radius: 9px; padding: 11px 12px; outline: none; font-size: 14px; margin-top: 4px; }
+  .inp:focus { border-color: var(--brand); }
+  .row { display: flex; gap: 8px; }
+  .btn { width: 100%; background: var(--brand); color: #fff; border: none; border-radius: 9px; padding: 11px; font-weight: 500; font-size: 14px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-ghost { background: #fff; border: 1px solid var(--brand); color: var(--brand); border-radius: 9px; padding: 0 14px; font-size: 13px; white-space: nowrap; }
+  .btn-outline { background: #fff; border: 1px solid var(--gray-200); color: var(--gray-600); border-radius: 9px; padding: 11px; font-size: 14px; width: 100%; }
+  .hint { font-size: 12px; color: var(--brand); margin-top: 6px; }
+  .err { font-size: 12px; color: var(--danger); margin-top: 6px; }
+  .tiny { font-size: 11px; color: var(--gray-400); text-align: center; margin-top: 16px; line-height: 1.6; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip { border: 1px solid var(--gray-200); background: #fff; color: var(--gray-600); border-radius: 999px; padding: 5px 12px; font-size: 13px; }
+  .chip.on { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); }
+
+  .modal-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; }
+  .modal-foot .skip { background: none; border: none; color: var(--gray-400); font-size: 13px; }
+  .modal-foot .primary { background: var(--brand); border: none; color: #fff; border-radius: 9px; padding: 10px 22px; font-size: 14px; font-weight: 500; }
+
+  /* ============ 产品首页（聊天） ============ */
+  .chat-app { display: flex; height: calc(100vh - 30px); background: #fff; }
+
+  /* 侧边栏（窄） */
+  aside { width: 232px; border-right: 1px solid var(--gray-200); background: var(--gray-50); display: flex; flex-direction: column; flex-shrink: 0; }
+  .side-pad { padding: 12px 16px; }
+  .new-chat-btn { width: 100%; background: var(--brand); color: #fff; border: none; border-radius: 10px; padding: 10px; font-weight: 500; font-size: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .conv-list { flex: 1; overflow-y: auto; padding: 4px 8px; }
+  .side-title { font-size: 12px; color: var(--gray-400); padding: 6px 8px; }
+  .conv { display: flex; align-items: center; justify-content: space-between; border-radius: 8px; padding: 8px; font-size: 14px; cursor: pointer; }
+  .conv:hover { background: var(--gray-100); }
+  .conv.on { background: var(--brand-soft); }
+  .conv .t { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .conv .ops { display: none; gap: 6px; }
+  .conv:hover .ops { display: flex; }
+  .conv .ops span { font-size: 12px; color: var(--gray-400); }
+  .side-foot { padding: 12px 16px; border-top: 1px solid var(--gray-200); }
+  .side-foot button { background: none; border: none; color: var(--gray-400); font-size: 12px; }
+
+  main.chat-main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
+  header.bar { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--gray-200); padding: 12px 18px; font-size: 14px; color: var(--gray-500); }
+  header.bar .map-link { background: none; border: none; color: var(--brand); font-size: 13px; }
+  .hamburger { display: none; background: none; border: none; font-size: 18px; color: var(--gray-500); }
+
+  /* 首屏居中问答框（首次提问前） */
+  .hero-ask { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+  .hero-ask.hidden { display: none; }
+  .hero-ask .welcome { text-align: center; margin-bottom: 26px; }
+  .hero-ask .welcome .emoji { font-size: 40px; }
+  .hero-ask .welcome h2 { font-size: 22px; margin-top: 10px; }
+  .hero-ask .welcome p { color: var(--gray-500); font-size: 14px; margin-top: 8px; }
+  .ask-box { width: 100%; max-width: 620px; }
+  .ask-input-wrap { border: 1px solid var(--gray-200); border-radius: 16px; padding: 8px 8px 8px 16px; display: flex; align-items: flex-end; gap: 8px; box-shadow: 0 8px 24px -12px rgba(0,0,0,.12); background: #fff; }
+  .ask-input-wrap:focus-within { border-color: var(--brand); }
+  .ask-input-wrap textarea { flex: 1; resize: none; border: none; outline: none; font-size: 15px; line-height: 1.5; max-height: 140px; padding: 6px 0; }
+  .icon-btn { border: 1px solid var(--gray-200); background: #fff; border-radius: 10px; padding: 8px 11px; font-size: 16px; }
+  .send-btn { background: var(--brand); color: #fff; border: none; border-radius: 10px; padding: 9px 16px; font-weight: 500; font-size: 14px; }
+  .send-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .suggest { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+  .suggest button { font-size: 13px; border: 1px solid var(--gray-200); background: #fff; color: var(--gray-600); border-radius: 999px; padding: 7px 16px; }
+  .suggest button:hover { border-color: var(--brand); color: var(--brand); }
+
+  /* 微信式聊天布局（首次提问后） */
+  .chat-view { flex: 1; display: none; flex-direction: column; min-height: 0; }
+  .chat-view.show { display: flex; }
+  .msgs { flex: 1; overflow-y: auto; padding: 20px 16px; background: var(--gray-50); }
+  .msgs-inner { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+  .bubble-row { display: flex; align-items: flex-start; gap: 10px; }
+  .bubble-row.user { flex-direction: row-reverse; }
+  .avatar-sm { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: grid; place-items: center; font-size: 15px; font-weight: 600; }
+  .avatar-sm.pet { background: linear-gradient(135deg,var(--brand),var(--brand-2)); color: #fff; }
+  .avatar-sm.user-b { background: linear-gradient(135deg,#f59e0b,#f97316); color: #fff; }
+  .avatar-sm.ai { background: #fff; border: 1px solid var(--gray-200); }
+  .bubble { max-width: 78%; border-radius: 12px; padding: 10px 14px; font-size: 14px; line-height: 1.7; position: relative; }
+  .bubble.user { background: var(--brand); color: #fff; border-top-right-radius: 3px; white-space: pre-wrap; }
+  .bubble.ai { background: #fff; border: 1px solid var(--gray-100); color: var(--gray-900); border-top-left-radius: 3px; }
+  .bubble.ai p { margin: 0 0 6px; white-space: pre-wrap; }
+  .bubble.ai p:last-child { margin-bottom: 0; }
+  .bubble img.up { max-height: 160px; border-radius: 8px; margin-bottom: 8px; display: block; }
+  .high-risk { border-left: 4px solid var(--danger); background: var(--danger-soft); color: var(--danger); padding: 10px 14px; border-radius: 8px; margin: 6px 0; font-weight: 700; }
+  .map-entry { margin-top: 8px; display: inline-block; background: var(--danger); color: #fff; border: none; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 500; }
+  .fb { margin-top: 8px; display: flex; gap: 14px; font-size: 12px; color: var(--gray-400); }
+  .fb button { background: none; border: none; color: inherit; }
+  .fb button.up-on { color: var(--brand); }
+  .fb button.down-on { color: var(--danger); }
+
+  /* 底部输入区（聊天视图内） */
+  .composer { border-top: 1px solid var(--gray-200); padding: 12px 16px; background: #fff; }
+  .composer-inner { max-width: 720px; margin: 0 auto; }
+  .img-preview { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; color: var(--gray-500); }
+  .img-preview img { height: 44px; width: 44px; object-fit: cover; border-radius: 6px; }
+  .img-preview button { background: none; border: none; color: var(--danger); font-size: 12px; }
+  .compose-row { display: flex; align-items: flex-end; gap: 8px; }
+  textarea.msg-input { flex: 1; resize: none; border: 1px solid var(--gray-200); border-radius: 10px; padding: 9px 12px; font-size: 14px; outline: none; max-height: 120px; line-height: 1.5; }
+  textarea.msg-input:focus { border-color: var(--brand); }
+
+  /* 用户头像模块（侧边栏顶部，可点箭头进「我的」） */
+  .user-module { padding: 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--gray-200); cursor: pointer; transition: background .15s; }
+  .user-module:hover { background: var(--gray-100); }
+  .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#f59e0b,#f97316); color: #fff; display: grid; place-items: center; font-size: 18px; font-weight: 600; flex-shrink: 0; }
+  .user-meta { flex: 1; min-width: 0; }
+  .user-meta .uname { font-size: 15px; font-weight: 600; }
+  .user-meta .uphone { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+  .user-module .arrow { color: var(--gray-300); font-size: 18px; flex-shrink: 0; }
+  .user-module:hover .arrow { color: var(--brand); }
+
+  /* 「我的」页面 */
+  .me-page { height: calc(100vh - 30px); display: flex; flex-direction: column; background: var(--gray-50); }
+  .me-bar { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: #fff; border-bottom: 1px solid var(--gray-200); }
+  .me-bar .back { background: none; border: none; font-size: 20px; color: var(--gray-600); line-height: 1; }
+  .me-bar h2 { font-size: 16px; }
+  .me-body { flex: 1; overflow-y: auto; padding: 20px 16px; max-width: 640px; margin: 0 auto; width: 100%; }
+  .me-profile { display: flex; align-items: center; gap: 14px; background: #fff; border: 1px solid var(--gray-100); border-radius: 14px; padding: 18px; }
+  .me-profile .user-avatar { width: 56px; height: 56px; font-size: 22px; }
+  .me-profile .pname { font-size: 17px; font-weight: 600; }
+  .me-profile .pphone { font-size: 13px; color: var(--gray-400); margin-top: 3px; }
+  .me-group { margin-top: 18px; }
+  .me-group .gtitle { font-size: 12px; color: var(--gray-400); padding: 0 4px 8px; }
+  .me-list { background: #fff; border: 1px solid var(--gray-100); border-radius: 14px; overflow: hidden; }
+  .me-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--gray-100); cursor: pointer; }
+  .me-item:last-child { border-bottom: none; }
+  .me-item:hover { background: var(--gray-50); }
+  .me-item .mi-ic { font-size: 18px; width: 22px; text-align: center; }
+  .me-item .mi-label { flex: 1; font-size: 14px; }
+  .me-item .mi-val { font-size: 13px; color: var(--gray-400); }
+  .me-item .mi-arrow { color: var(--gray-300); font-size: 16px; }
+  .me-item.danger .mi-label { color: var(--danger); }
+  .me-toggle { width: 40px; height: 22px; border-radius: 999px; background: var(--gray-200); position: relative; transition: background .15s; flex-shrink: 0; }
+  .me-toggle.on { background: var(--brand); }
+  .me-toggle::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .15s; }
+  .me-toggle.on::after { transform: translateX(18px); }
+
+  /* 宠物信息卡片（问答区左上角）——方形卡片 + 圆形加号 */
+  .pet-cards { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px 0; flex-wrap: wrap; }
+  .pet-card { position: relative; width: 140px; height: 140px; border: 1px solid var(--gray-200); border-radius: 14px; padding: 14px; background: #fff; background-size: cover; background-position: center; transition: box-shadow .15s, border-color .15s; overflow: hidden; }
+  .pet-card:hover { border-color: var(--brand); box-shadow: 0 6px 18px -10px rgba(109,94,252,.4); }
+  /* 有背景图时压一层暗色渐变，保证左上角文字可读 */
+  .pet-card.has-bg::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.45) 0%, rgba(0,0,0,.1) 45%, rgba(0,0,0,.35) 100%); }
+  /* 名字+品种放卡片左上角 */
+  .pet-card .pc-head { position: relative; z-index: 1; }
+  .pet-card .pc-name { font-size: 16px; font-weight: 600; }
+  .pet-card .pc-desc { font-size: 12px; color: var(--gray-400); margin-top: 4px; line-height: 1.5; }
+  .pet-card.has-bg .pc-name { color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+  .pet-card.has-bg .pc-desc { color: rgba(255,255,255,.9); text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+  /* hover 出现的编辑/提问行：绝对定位在卡片底部，不改变卡片高度（避免抖动） */
+  .pet-card .pc-actions { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: linear-gradient(to top, #fff 70%, rgba(255,255,255,0)); border-top: 1px solid var(--gray-100); opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s; pointer-events: none; }
+  .pet-card.has-bg .pc-actions { background: linear-gradient(to top, rgba(0,0,0,.6) 60%, rgba(0,0,0,0)); border-top: none; }
+  .pet-card:hover .pc-actions { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .pet-card .pc-actions button { background: none; border: none; font-size: 12px; cursor: pointer; padding: 2px 0; }
+  .pet-card .pc-edit { color: var(--gray-500); }
+  .pet-card .pc-edit:hover { color: var(--brand); }
+  .pet-card .pc-ask { color: var(--brand); font-weight: 500; }
+  .pet-card.has-bg .pc-edit { color: rgba(255,255,255,.85); }
+  .pet-card.has-bg .pc-ask { color: #fff; }
+  /* 添加宠物圆形加号 + 上限红色提示 */
+  .pet-add-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .pet-add { width: 44px; height: 44px; border-radius: 50%; border: 1px dashed var(--gray-300); background: #fff; color: var(--gray-400); font-size: 22px; display: grid; place-items: center; cursor: pointer; transition: all .15s; flex-shrink: 0; }
+  .pet-add:hover { border-color: var(--brand); color: var(--brand); background: var(--brand-soft); }
+  .pet-add-hint { font-size: 11px; color: var(--danger); text-align: center; max-width: 64px; line-height: 1.3; opacity: 0; transition: opacity .15s; }
+  .pet-add-hint.show { opacity: 1; }
+
+  /* 资源地图弹窗 */
+  .vet-tip { background: #fffbeb; color: #b45309; font-size: 12px; padding: 8px 12px; border-radius: 6px; margin-bottom: 10px; }
+  .vet { border: 1px solid var(--gray-100); border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+  .vet .n { font-weight: 500; display: flex; justify-content: space-between; }
+  .vet .n span.d { font-size: 12px; color: var(--gray-400); font-weight: 400; }
+  .vet .a { font-size: 12px; color: var(--gray-500); margin-top: 4px; }
+  .vet .tel { font-size: 12px; color: var(--brand); margin-top: 4px; display: inline-block; text-decoration: none; }
+
+  @media (max-width: 640px) {
+    aside { position: fixed; inset: 0 auto 0 0; z-index: 40; transform: translateX(-100%); transition: transform .2s; }
+    aside.open { transform: translateX(0); }
+    .hamburger { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="demo-banner">
+  🦦 <b>异宠AI问答 · 纯前端演示</b>　可交互原型（内置 mock AI，无需后端/数据库）。真实版为 Next.js 全栈，见 <b>web/</b> 目录
+</div>
+
+<!-- ============ ① 官网落地页 ============ -->
+<section id="screen-landing" class="screen active">
+  <div class="landing">
+    <nav class="nav">
+      <div class="brand-logo"><span class="dot">🦦</span> 异宠AI问答</div>
+      <div class="nav-links">
+        <a href="#feat">产品能力</a>
+        <a href="#feat">适用宠物</a>
+        <a href="#feat">安全边界</a>
+      </div>
+      <div class="nav-cta">
+        <button class="ghost" onclick="App.openAuth()">登录</button>
+        <button class="solid" onclick="App.openAuth()">注册</button>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <div>
+        <span class="tag">聚焦哺乳异宠 · 雪貂为主</span>
+        <h1>养异宠遇到问题<br/>先问 <span class="hl">异宠AI</span>，随时有依据</h1>
+        <p class="lead">异宠兽医稀缺、看病难看病贵。喂养、行为、异常，随时可问；遇到真正紧急的情况，会明确提醒你并帮你找到附近能就诊的医院。</p>
+        <div class="hero-cta">
+          <button class="primary" onclick="App.openAuth()">免费开始提问</button>
+          <button class="second" onclick="document.getElementById('feat').scrollIntoView({behavior:'smooth'})">了解更多</button>
+        </div>
+        <p class="trust">一期完全免费 · 无使用限额 · AI 辅助参考，不替代执业兽医诊断</p>
+      </div>
+
+      <div class="hero-card">
+        <div class="mini-bar"><i></i><i></i><i></i></div>
+        <div class="hc-msg u">我家貂最近老掉毛，还特别爱咬东西</div>
+        <div class="hc-msg a">这些变化值得留意。掉毛+异常亢奋对雪貂来说，有时是肾上腺相关问题的早期信号，建议观察记录、必要时就医…</div>
+        <div class="hc-msg u">它突然抽搐，叫不醒！</div>
+        <div class="hc-msg a">
+          <div class="hc-risk">请立即就医</div>
+          可能属于紧急状况，已为你准备附近医院入口。
+        </div>
+      </div>
+    </div>
+
+    <div class="features" id="feat">
+      <div class="feat"><div class="ic">💬</div><h3>开放式 AI 问答</h3><p>喂食、环境、行为随便问，支持连续追问与图片辅助描述，像聊天一样自然。</p></div>
+      <div class="feat"><div class="ic">🛡️</div><h3>三层安全判断</h3><p>日常养护开放答；行为异常识别潜在风险；明确症状切换安全话术，高危明确提醒就医。</p></div>
+      <div class="feat"><div class="ic">📍</div><h3>紧急资源地图</h3><p>识别到高危信号时，帮你定位附近能看异宠的宠物医院 / 急诊，第一时间不慌。</p></div>
+    </div>
+
+    <div class="landing-foot">© 2026 异宠AI问答 · 演示版本 · AI 辅助参考，不替代执业兽医诊断</div>
+  </div>
+</section>
+
+<!-- ============ ⑤ 产品首页（聊天） ============ -->
+<section id="screen-chat" class="screen">
+  <div class="chat-app">
+    <aside id="sidebar">
+      <!-- ② 用户头像模块（点击进入「我的」） -->
+      <div class="user-module" onclick="App.openMe()">
+        <div class="user-avatar" id="userAvatar">异</div>
+        <div class="user-meta">
+          <div class="uname" id="userName">异宠用户</div>
+          <div class="uphone" id="userPhone">已登录</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+      <!-- 新对话按钮（头像模块下面） -->
+      <div class="side-pad">
+        <button class="new-chat-btn" onclick="App.newChat()">＋ 新对话</button>
+      </div>
+      <div class="conv-list">
+        <p class="side-title">历史对话</p>
+        <div id="convList"></div>
+      </div>
+      <div class="side-foot">
+        <button onclick="App.logout()">退出登录</button>
+      </div>
+    </aside>
+
+    <main class="chat-main">
+      <header class="bar">
+        <button class="hamburger" onclick="App.toggleSidebar()">☰</button>
+        <div>异宠AI问答</div>
+        <button class="map-link" onclick="App.openMap('manual')">资源地图</button>
+      </header>
+
+      <!-- ③④ 宠物信息卡片区（问答区左上角，卡片+加号；hover 出现编辑/提问） -->
+      <div class="pet-cards" id="petCards"></div>
+
+      <!-- 首屏居中问答框（首次提问前显示） -->
+      <div class="hero-ask" id="heroAsk">
+        <div class="welcome">
+          <div class="emoji">🦦</div>
+          <h2>你好，我是你的异宠养护助手</h2>
+          <p>可以问我喂食、环境、行为，或描述「十一」最近的异常</p>
+        </div>
+        <div class="ask-box">
+          <div id="heroImgPreview" class="img-preview" style="display:none"></div>
+          <div class="ask-input-wrap">
+            <textarea id="heroInput" rows="1" placeholder="描述你的问题，如：我家貂最近老掉毛，精神有点亢奋…"></textarea>
+            <button class="icon-btn" onclick="App.pickImage('hero')" title="上传图片（演示）">📷</button>
+            <button class="send-btn" onclick="App.send('hero')">发送</button>
+          </div>
+          <div class="suggest" id="suggestBar"></div>
+        </div>
+      </div>
+
+      <!-- 聊天视图（首次提问后显示） -->
+      <div class="chat-view" id="chatView">
+        <div class="msgs" id="msgs"><div class="msgs-inner" id="msgsInner"></div></div>
+        <div class="composer">
+          <div class="composer-inner">
+            <div id="imgPreview" class="img-preview" style="display:none"></div>
+            <div class="compose-row">
+              <button class="icon-btn" onclick="App.pickImage('chat')" title="上传图片（演示）">📷</button>
+              <textarea id="msgInput" class="msg-input" rows="1" placeholder="继续提问…"></textarea>
+              <button class="send-btn" id="chatSendBtn" onclick="App.send('chat')">发送</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</section>
+
+<!-- 「我的」页面挂载点 -->
+<div id="screen-me-mount"></div>
+
+<!-- 弹窗挂载点 -->
+<div id="modalMount"></div>
+
+<script>
+/* ============================================================
+   纯前端 mock：复刻后端三层判断
+   ============================================================ */
+const EMERGENCY_KW = ["抽搐","痉挛","出血","流血","难产","无法进食","不吃不喝","呼吸困难","喘不上气","昏迷","瘫痪","中毒","严重脱水","持续呕吐","大量呕吐","休克"];
+const SYMPTOM_KW = ["呕吐","拉稀","腹泻","发烧","发热","咳嗽","打喷嚏","流鼻涕","疼","痛","肿","伤口","生病","症状","血","不吃","没精神","脱水"];
+const ANOMALY_KW = ["掉毛","脱毛","毛少","变瘦","消瘦","亢奋","爱咬","性格","嗜睡","尾巴","鼠尾","拉尿","徘徊","皮炎","发抖","无力"];
+
+function classify(t){
+  if (SYMPTOM_KW.some(k=>t.includes(k)) || EMERGENCY_KW.some(k=>t.includes(k))) return "symptom_disease";
+  if (ANOMALY_KW.some(k=>t.includes(k))) return "behavior_anomaly";
+  return "daily_care";
+}
+function mockAnswer(text){
+  const type = classify(text);
+  const emergency = EMERGENCY_KW.some(k=>text.includes(k));
+  if (type === "daily_care") return { is_high_risk:false, answer:
+    "关于你的养护问题，通用建议如下：保持环境清洁与适宜温湿度，提供符合品种需求的高蛋白食物与清洁饮水，每天保证一定的活动与互动时间。\n\n（演示为内置回答，真实版由通义千问 Qwen-VL 作答。）" };
+  if (type === "behavior_anomaly") return { is_high_risk:false, answer:
+    "你描述的这些变化值得留意。对雪貂来说，掉毛+异常亢奋有时是肾上腺相关问题的早期信号，嗜睡+消瘦则需警惕淋巴瘤。这些早期迹象容易被当成正常换毛或性格变化。\n\n建议先观察记录变化的频率和程度，若持续或加重，择期咨询能看异宠的兽医。\n\n（演示为内置回答，真实版会结合品种知识与 RAG 综合判断。）" };
+  return { is_high_risk:emergency, answer:
+    (emergency ? "**请立即就医**\n\n你描述的情况可能属于紧急状况，建议尽快带它去能看异宠的宠物医院。可点击下方按钮用「资源地图」查找附近医院。\n\n" : "") +
+    "可能性参考（不构成确诊）：需结合更多信息判断，常见于消化道不适或感染等。\n" +
+    "紧急程度：" + (emergency ? "立即就医" : "建议尽快就医") + "。\n" +
+    "家庭可做：保持安静、注意保暖与补水，避免自行用药。\n\n" +
+    "本回答为 AI 辅助参考，不替代执业兽医诊断。" };
+}
+
+const MOCK_VETS = [
+  { name:"（示例）宠物医院·中心店", address:"示例市示例区示例路 1 号", tel:"010-00000000", dist:800 },
+  { name:"（示例）24 小时动物急诊", address:"示例市示例区示例大道 88 号", tel:"010-11111111", dist:2300 },
+  { name:"（示例）异宠特色宠物诊所", address:"示例市示例区示例街 5 号", tel:"010-22222222", dist:3600 },
+];
+
+/* ============================================================
+   状态（内存，刷新即重置——方便反复看首次流程）
+   ============================================================ */
+const state = {
+  loggedIn: false,
+  petDialogShown: false,   // ③ 会话内记录：宠物弹窗是否已弹过
+  user: { name:"异宠用户", phone:"188****0000" },
+  pets: [],                // 多只宠物 {name, species, ageMonths, sex}
+  convs: [],               // {id,title,msgs,started}
+  activeConvId: null,
+  pendingImage: null,
+  streaming: false,
+  notify: { highRisk:true, location:true }, // 「我的」页开关演示
+};
+let idc = 1; const uid = () => "id" + (idc++);
+const SPECIES = ["雪貂","仓鼠","龙猫","蜜袋鼯","其他"];
+const MAX_PETS = 5; // ① 最多支持添加 5 只宠物
+const SUGGEST = ["雪貂一天喂几次？","笼子和垫材怎么选？","最近老掉毛，还爱咬东西","它一直呕吐还拉稀","突然抽搐，叫不醒"];
+
+// 年龄（月）转可读文案，供卡片与「提问」背景前缀使用
+function ageLabel(m){ if(m==null) return null; if(m<12) return m+'个月'; const y=Math.floor(m/12), r=m%12; return r? y+'岁'+r+'个月' : y+'岁'; }
+function sexLabel(x){ return x==='MALE'?'公':x==='FEMALE'?'母':null; }
+function petSummary(p){ return [p.species, ageLabel(p.ageMonths), sexLabel(p.sex)].filter(Boolean).join(' · '); }
+
+// 剥掉对话框开头由「提问」按钮填入的宠物背景前缀（形如「我家<名字>（…），」）。
+// 逐个匹配当前所有宠物的前缀，循环剥离，兼容此前误叠加的多段前缀；只保留用户输入的问题正文。
+function stripPetPrefix(text){
+  let s = text || '';
+  let changed = true;
+  while(changed){
+    changed = false;
+    const t = s.replace(/^\s+/, '');
+    for(const p of state.pets){
+      const head = `我家${p.name}（`;
+      if(t.startsWith(head)){
+        const close = t.indexOf('），', head.length);
+        if(close !== -1){
+          s = t.slice(close + 2); // 去掉「），」
+          changed = true;
+          break;
+        }
+      }
+    }
+  }
+  return s;
+}
+
+const $ = s => document.querySelector(s);
+function show(screen){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); $('#screen-'+screen).classList.add('active'); }
+function esc(s){ return (s||'').replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function firstChar(name){ return (name||'宠').trim().charAt(0) || '宠'; }
+
+const App = {
+  /* ---------- ② 登录/注册弹窗 ---------- */
+  openAuth(){
+    $('#modalMount').innerHTML = `
+    <div class="modal-mask" onclick="if(event.target===this)App.closeModal()">
+      <div class="modal">
+        <div class="modal-head"><h3>登录 / 注册</h3><button class="x" onclick="App.closeModal()">×</button></div>
+        <div class="modal-body">
+          <p class="modal-sub">未注册的手机号将自动创建账号。</p>
+          <div class="field"><input id="authPhone" class="inp" placeholder="手机号" inputmode="numeric" maxlength="11"/></div>
+          <div class="field row">
+            <input id="authCode" class="inp" placeholder="6 位验证码" inputmode="numeric" maxlength="6"/>
+            <button id="authSend" class="btn-ghost" onclick="App.sendCode()">获取验证码</button>
+          </div>
+          <div id="authHint" class="hint" style="display:none"></div>
+          <div id="authErr" class="err" style="display:none"></div>
+          <div class="field"><button class="btn" onclick="App.doAuth()">登录 / 注册</button></div>
+          <p class="tiny">登录即表示同意，本产品 AI 回答为辅助参考，不替代执业兽医诊断。</p>
+        </div>
+      </div>
+    </div>`;
+    const p=$('#authPhone'); p.addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,11));
+    $('#authCode').addEventListener('input',e=>e.target.value=e.target.value.replace(/\D/g,'').slice(0,6));
+    setTimeout(()=>p.focus(),50);
+  },
+  sendCode(){
+    const phone=$('#authPhone').value;
+    if(!/^1[3-9]\d{9}$/.test(phone)){ this._authErr('请输入有效的手机号'); return; }
+    $('#authErr').style.display='none';
+    $('#authHint').style.display='block'; $('#authHint').textContent='开发/演示模式：验证码为 000000';
+    let c=60; const b=$('#authSend'); b.disabled=true; b.textContent=c+'s';
+    const t=setInterval(()=>{ c--; b.textContent=c+'s'; if(c<=0){clearInterval(t);b.disabled=false;b.textContent='重新发送';} },1000);
+  },
+  _authErr(m){ $('#authErr').style.display='block'; $('#authErr').textContent=m; },
+  doAuth(){
+    const phone=$('#authPhone').value, code=$('#authCode').value;
+    if(!/^1[3-9]\d{9}$/.test(phone)){ this._authErr('请输入有效的手机号'); return; }
+    if(code!=='000000'){ this._authErr('演示模式验证码为 000000'); return; }
+    state.loggedIn=true;
+    // 用手机号中间打码作为演示用户信息
+    state.user = { name:'异宠用户', phone: phone.slice(0,3)+'****'+phone.slice(7) };
+    this.closeModal();
+    this.enterHome();
+  },
+
+  /* ---------- ③④ 进入主页 + 首次宠物弹窗 ---------- */
+  enterHome(){
+    show('chat');
+    this.renderUser(); this.renderPetCards(); this.renderSuggest(); this.renderConvs(); this.renderMsgs(); this.updateView();
+    // 首次（会话内）弹一次宠物注册弹窗
+    if(!state.petDialogShown){
+      state.petDialogShown = true;
+      this.openPetDialog({ firstTime:true });
+    }
+  },
+  // opts: { firstTime?:bool, editIndex?:number }
+  openPetDialog(opts={}){
+    const { firstTime=false, editIndex=null } = opts;
+    const editing = editIndex!==null;
+    const p = editing ? state.pets[editIndex] : null;
+    const title = firstTime ? '完善宠物信息' : (editing ? '编辑宠物信息' : '添加宠物');
+    // ③ 卡片背景图：进入弹窗时载入已有背景，供本次编辑
+    this._pendingBg = p?.bg || null;
+    // ① 首次：右上角「暂不填写」；否则右上角「×」关闭
+    const topRight = firstTime
+      ? `<button class="skip-top" onclick="App.closePetDialog(true)">暂不填写</button>`
+      : `<button class="x" onclick="App.closeModal()">×</button>`;
+    $('#modalMount').innerHTML = `
+    <div class="modal-mask" onclick="if(event.target===this)${firstTime?'App.closePetDialog(true)':'App.closeModal()'}">
+      <div class="modal">
+        <div class="modal-head"><h3>${title}</h3>${topRight}</div>
+        <div class="modal-body">
+          <p class="modal-sub">填一次，之后每次提问都会自动带上它的背景，无需重复介绍。</p>
+          <div class="field"><label class="lbl">昵称</label>
+            <input id="pfName" class="inp" placeholder="如：十一" value="${esc(p?.name||'')}"/></div>
+          <div class="field"><label class="lbl">品种</label>
+            <div class="chips" id="pfSpecies">${SPECIES.map(s=>{
+              const on = p ? (p.species===s || (!SPECIES.includes(p.species)&&s==='其他')) : (s==='雪貂');
+              return `<button type="button" class="chip ${on?'on':''}" data-s="${s}" onclick="App.pickSpecies(this)">${s}</button>`;
+            }).join('')}</div>
+            <input id="pfCustom" class="inp" placeholder="请填写品种" style="display:${p&&!SPECIES.includes(p.species)?'block':'none'};margin-top:8px" value="${p&&!SPECIES.includes(p.species)?esc(p.species):''}"/></div>
+          <div class="field"><label class="lbl">年龄（可留空）</label>
+            <div class="row" style="align-items:center;gap:6px">
+              <input id="pfY" class="inp" style="width:70px" placeholder="0" inputmode="numeric" maxlength="2" value="${p&&p.ageMonths!=null?Math.floor(p.ageMonths/12):''}"/> <span style="font-size:13px;color:var(--gray-500)">岁</span>
+              <input id="pfM" class="inp" style="width:70px" placeholder="0" inputmode="numeric" maxlength="2" value="${p&&p.ageMonths!=null?p.ageMonths%12:''}"/> <span style="font-size:13px;color:var(--gray-500)">个月</span>
+            </div></div>
+          <div class="field"><label class="lbl">性别</label>
+            <div class="chips" id="pfSex">
+              <button type="button" class="chip ${p&&p.sex==='MALE'?'on':''}" data-x="MALE" onclick="App.pickSex(this)">公</button>
+              <button type="button" class="chip ${p&&p.sex==='FEMALE'?'on':''}" data-x="FEMALE" onclick="App.pickSex(this)">母</button>
+              <button type="button" class="chip ${!p||p.sex==='UNKNOWN'?'on':''}" data-x="UNKNOWN" onclick="App.pickSex(this)">未知</button>
+            </div></div>
+          <!-- ③ 自定义卡片背景图 -->
+          <div class="field"><label class="lbl">卡片背景（可选，上传一张图片）</label>
+            <div id="pfBgBox" style="margin-top:6px"></div>
+          </div>
+          <div id="pfErr" class="err" style="display:none"></div>
+          <div class="modal-foot">
+            <span></span>
+            <button class="primary" onclick="App.savePet(${firstTime}, ${editing?editIndex:'null'})">${firstTime?'完成':'保存'}</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    this._renderPetBgBox();
+  },
+  // ③ 背景图区：无图时显示上传按钮；有图时显示缩略图 + 更换/移除
+  _renderPetBgBox(){
+    const box = $('#pfBgBox'); if(!box) return;
+    if(this._pendingBg){
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:56px;height:56px;border-radius:10px;background-image:url('${this._pendingBg}');background-size:cover;background-position:center;border:1px solid var(--gray-200)"></div>
+          <button type="button" class="btn-ghost" onclick="App.pickPetBg()">更换</button>
+          <button type="button" style="background:none;border:none;color:var(--danger);font-size:13px" onclick="App.removePetBg()">移除</button>
+        </div>`;
+    } else {
+      box.innerHTML = `<button type="button" class="btn-outline" style="width:auto;padding:9px 16px" onclick="App.pickPetBg()">🖼 上传背景图</button>`;
+    }
+  },
+  pickPetBg(){
+    const inp=document.createElement('input'); inp.type='file'; inp.accept='image/jpeg,image/png,image/webp';
+    inp.onchange=()=>{ const f=inp.files[0]; if(!f)return;
+      if(f.size>10*1024*1024){ alert('图片体积超过 10MB'); return; }
+      this._pendingBg = URL.createObjectURL(f); this._renderPetBgBox();
+    };
+    inp.click();
+  },
+  removePetBg(){ this._pendingBg=null; this._renderPetBgBox(); },
+  pickSpecies(el){ el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); $('#pfCustom').style.display = el.dataset.s==='其他'?'block':'none'; },
+  pickSex(el){ el.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); el.classList.add('on'); },
+  savePet(firstTime, editIndex){
+    const name=$('#pfName').value.trim();
+    let sp=$('#pfSpecies .chip.on').dataset.s; if(sp==='其他') sp=$('#pfCustom').value.trim();
+    if(!name){ $('#pfErr').style.display='block'; $('#pfErr').textContent='请填写昵称'; return; }
+    if(!sp){ $('#pfErr').style.display='block'; $('#pfErr').textContent='请填写品种'; return; }
+    const y=parseInt($('#pfY').value||'0',10), m=parseInt($('#pfM').value||'0',10);
+    const noAge=$('#pfY').value===''&&$('#pfM').value==='';
+    const pet={ name, species:sp, ageMonths:noAge?null:(y*12+m), sex:$('#pfSex .chip.on').dataset.x, bg:this._pendingBg||null };
+    if(editIndex!==null && editIndex!==undefined){ state.pets[editIndex]=pet; }
+    else { state.pets.push(pet); }
+    this.closeModal(); this.renderPetCards(); this.renderSuggest(); this.refreshMeIfOpen();
+  },
+  // ① 暂不填写：不添加宠物，直接进首页（卡片区仅剩「＋」加号）
+  closePetDialog(){ this.closeModal(); this.renderPetCards(); this.renderSuggest(); },
+  // 若「我的」页当前打开，重渲染以反映宠物增改
+  refreshMeIfOpen(){ if($('#screen-me')) this.openMe(); },
+  addPet(){
+    // ① 上限拦截：已满 5 只时不弹弹窗，在加号下方显示红色提示（2.5s 后淡出）
+    if(state.pets.length >= MAX_PETS){
+      const hint = $('#petAddHint');
+      if(hint){
+        hint.classList.add('show');
+        clearTimeout(this._addHintTimer);
+        this._addHintTimer = setTimeout(()=>hint.classList.remove('show'), 2500);
+      }
+      return;
+    }
+    this.openPetDialog({});
+  },
+  editPet(i){ this.openPetDialog({ editIndex:i }); },
+
+  /* ---------- ② 「我的」页面 ---------- */
+  openMe(){
+    const u = state.user;
+    const petLines = state.pets.length
+      ? state.pets.map((p,i)=>`<div class="me-item" onclick="App.editPet(${i})"><span class="mi-ic">🐾</span><span class="mi-label">${esc(p.name)}</span><span class="mi-val">${esc(petSummary(p))}</span><span class="mi-arrow">›</span></div>`).join('')
+      : `<div class="me-item" onclick="App.addPet()"><span class="mi-ic">🐾</span><span class="mi-label">还没有添加宠物</span><span class="mi-val">去添加</span><span class="mi-arrow">›</span></div>`;
+    $('#screen-me-mount').innerHTML = `
+    <section id="screen-me" class="screen active">
+      <div class="me-page">
+        <div class="me-bar"><button class="back" onclick="App.closeMe()">‹</button><h2>我的</h2></div>
+        <div class="me-body">
+          <div class="me-profile">
+            <div class="user-avatar">${firstChar(u.name)}</div>
+            <div><div class="pname">${esc(u.name)}</div><div class="pphone">${esc(u.phone)}</div></div>
+          </div>
+
+          <div class="me-group"><div class="gtitle">我的宠物（${state.pets.length}/${MAX_PETS}）</div>
+            <div class="me-list">
+              ${petLines}
+              ${state.pets.length >= MAX_PETS
+                ? `<div class="me-item" style="cursor:default"><span class="mi-ic">＋</span><span class="mi-label" style="color:var(--gray-400)">添加宠物</span><span class="mi-val" style="color:var(--danger)">暂仅支持添加 5 只宠物</span></div>`
+                : `<div class="me-item" onclick="App.addPet()"><span class="mi-ic">＋</span><span class="mi-label" style="color:var(--brand)">添加宠物</span><span class="mi-arrow">›</span></div>`}
+            </div>
+          </div>
+
+          <div class="me-group"><div class="gtitle">账号与安全</div>
+            <div class="me-list">
+              <div class="me-item"><span class="mi-ic">📱</span><span class="mi-label">手机号</span><span class="mi-val">${esc(u.phone)}</span></div>
+              <div class="me-item danger" onclick="App.logout()"><span class="mi-ic">🚪</span><span class="mi-label">退出登录</span><span class="mi-arrow">›</span></div>
+            </div>
+          </div>
+
+          <div class="me-group"><div class="gtitle">通知与隐私</div>
+            <div class="me-list">
+              <div class="me-item"><span class="mi-ic">🚨</span><span class="mi-label">高危就医提醒</span><div class="me-toggle ${state.notify.highRisk?'on':''}" onclick="App.toggleNotify('highRisk', this)"></div></div>
+              <div class="me-item"><span class="mi-ic">📍</span><span class="mi-label">允许定位（资源地图）</span><div class="me-toggle ${state.notify.location?'on':''}" onclick="App.toggleNotify('location', this)"></div></div>
+              <div class="me-item"><span class="mi-ic">📄</span><span class="mi-label">隐私政策 / 用户协议</span><span class="mi-arrow">›</span></div>
+            </div>
+          </div>
+
+          <div class="me-group"><div class="gtitle">关于与免责</div>
+            <div class="me-list">
+              <div class="me-item"><span class="mi-ic">ℹ️</span><span class="mi-label">版本</span><span class="mi-val">演示版 v0.1</span></div>
+              <div class="me-item"><span class="mi-ic">⚕️</span><span class="mi-label">AI 免责声明</span><span class="mi-val">辅助参考，不替代兽医</span></div>
+              <div class="me-item"><span class="mi-ic">💬</span><span class="mi-label">意见反馈</span><span class="mi-arrow">›</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>`;
+    show('me');
+  },
+  closeMe(){ $('#screen-me-mount').innerHTML=''; show('chat'); },
+  toggleNotify(key, el){ state.notify[key]=!state.notify[key]; el.classList.toggle('on', state.notify[key]); },
+
+  /* ---------- 渲染 ---------- */
+  renderUser(){
+    const u = state.user;
+    $('#userAvatar').textContent = firstChar(u.name);
+    $('#userName').textContent = u.name;
+    $('#userPhone').textContent = u.phone;
+  },
+  // ③④ 宠物卡片区：每只一张方形卡片（名字+品种在左上角，可自定义背景图），末尾一个圆形加号
+  renderPetCards(){
+    const cards = state.pets.map((p,i)=>{
+      const hasBg = !!p.bg;
+      const bgStyle = hasBg ? ` style="background-image:url('${p.bg}')"` : '';
+      return `
+      <div class="pet-card${hasBg?' has-bg':''}"${bgStyle}>
+        <div class="pc-head">
+          <div class="pc-name">${esc(p.name)}</div>
+          <div class="pc-desc">${esc(petSummary(p))}</div>
+        </div>
+        <div class="pc-actions">
+          <button class="pc-edit" onclick="App.editPet(${i})">编辑</button>
+          <button class="pc-ask" onclick="App.askWithPet(${i})">提问 ›</button>
+        </div>
+      </div>`;
+    }).join('');
+    // ① 加号带上限提示（红色小字，点满 5 只再点时显示）
+    const addBlock = `
+      <div class="pet-add-wrap">
+        <div class="pet-add" title="添加宠物" onclick="App.addPet()">＋</div>
+        <div class="pet-add-hint" id="petAddHint">暂仅支持添加 5 只宠物</div>
+      </div>`;
+    $('#petCards').innerHTML = cards + addBlock;
+    // 首屏欢迎语按是否有宠物调整
+    const w = $('#heroAsk') && $('#heroAsk').querySelector('.welcome p');
+    if(w) w.textContent = state.pets.length
+      ? `可以问我喂食、环境、行为，或描述「${state.pets[0].name}」最近的异常`
+      : `可以问我喂食、环境、行为，或它最近的异常；点上方「＋」可添加宠物档案`;
+  },
+  // ④ 提问：把宠物基础信息作为背景前缀句填进当前问答框。
+  //   点不同宠物卡片时，覆盖上一次填入的宠物前缀，但保留用户自己输入的问题文字。
+  askWithPet(i){
+    const p = state.pets[i];
+    const parts = [p.species, ageLabel(p.ageMonths), sexLabel(p.sex)].filter(Boolean).join('，');
+    const prefix = `我家${p.name}（${parts}），`;
+    const conv = this.curConv();
+    const started = conv && conv.msgs.length>0;
+    const el = started ? $('#msgInput') : $('#heroInput');
+    // 先剥掉已存在的宠物前缀（可能来自上一次点击），只保留用户输入的问题正文
+    const question = stripPetPrefix(el.value);
+    el.value = prefix + question;
+    el.focus();
+    // 光标停在前缀后，方便用户接着补充问题
+    const pos = prefix.length; el.setSelectionRange && el.setSelectionRange(pos, pos);
+  },
+  renderSuggest(){ $('#suggestBar').innerHTML = SUGGEST.map(q=>`<button onclick="App.quick('${esc(q)}')">${esc(q)}</button>`).join(''); },
+  quick(q){ this.send('hero', q); },
+  renderConvs(){
+    $('#convList').innerHTML = state.convs.map(c=>
+      `<div class="conv ${c.id===state.activeConvId?'on':''}" onclick="App.openConv('${c.id}')">
+         <span class="t">${esc(c.title)}</span>
+         <span class="ops"><span onclick="event.stopPropagation();App.renameConv('${c.id}')">改</span><span onclick="event.stopPropagation();App.deleteConv('${c.id}')">删</span></span>
+       </div>`).join('');
+  },
+  curConv(){ return state.convs.find(c=>c.id===state.activeConvId); },
+  // ⑧ 首次提问前显示居中问答框；提问后切换为聊天布局
+  updateView(){
+    const conv=this.curConv();
+    const started = conv && conv.msgs.length>0;
+    $('#heroAsk').classList.toggle('hidden', !!started);
+    $('#chatView').classList.toggle('show', !!started);
+  },
+  renderMsgs(){
+    const conv=this.curConv();
+    if(!conv){ $('#msgsInner').innerHTML=''; return; }
+    $('#msgsInner').innerHTML = conv.msgs.map(m=>this.bubbleHTML(m)).join('');
+    $('#msgs').scrollTop = $('#msgs').scrollHeight;
+  },
+  bubbleHTML(m){
+    const userChar = firstChar(state.user.name);
+    if(m.role==='USER'){
+      return `<div class="bubble-row user">
+        <div class="avatar-sm user-b">${userChar}</div>
+        <div class="bubble user">${m.imageUrl?`<img class="up" src="${m.imageUrl}"/>`:''}${esc(m.content)}</div></div>`;
+    }
+    const body = this.renderAnswer(m.content);
+    const mapBtn = m.isHighRisk ? `<button class="map-entry" onclick="App.openMap('high_risk')">📍 资源地图 · 查找附近医院</button>` : '';
+    const fb = m.streaming ? '' : `<div class="fb">
+        <button class="${m.fb==='UP'?'up-on':''}" onclick="App.feedback('${m.id}','UP')">👍 有用</button>
+        <button class="${m.fb==='DOWN'?'down-on':''}" onclick="App.feedback('${m.id}','DOWN')">👎 没帮助</button></div>`;
+    return `<div class="bubble-row ai">
+      <div class="avatar-sm ai">🦦</div>
+      <div class="bubble ai">${body}${mapBtn}${fb}</div></div>`;
+  },
+  renderAnswer(text){
+    return text.split('\n').map(line=>{
+      const inline = esc(line).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+      if(/请立即就医/.test(line)) return `<div class="high-risk">${inline}</div>`;
+      return `<p>${inline}</p>`;
+    }).join('');
+  },
+
+  /* ---------- 会话 ---------- */
+  newChat(){ state.activeConvId=null; this.clearImage(); this.renderConvs(); this.renderMsgs(); this.updateView(); this.closeSidebar(); $('#heroInput').value=''; $('#heroInput').focus(); },
+  openConv(id){ state.activeConvId=id; this.clearImage(); this.renderConvs(); this.renderMsgs(); this.updateView(); this.closeSidebar(); },
+  renameConv(id){ const c=state.convs.find(x=>x.id===id); const t=prompt('重命名会话',c.title); if(t){c.title=t.slice(0,40);this.renderConvs();} },
+  deleteConv(id){ if(!confirm('删除该会话？'))return; state.convs=state.convs.filter(c=>c.id!==id); if(state.activeConvId===id)state.activeConvId=null; this.renderConvs(); this.renderMsgs(); this.updateView(); },
+
+  /* ---------- 图片 ---------- */
+  pickImage(where){
+    const inp=document.createElement('input'); inp.type='file'; inp.accept='image/jpeg,image/png,image/webp';
+    inp.onchange=()=>{ const f=inp.files[0]; if(!f)return;
+      if(f.size>10*1024*1024){ alert('图片体积超过 10MB'); return; }
+      state.pendingImage=URL.createObjectURL(f); this._renderImgPreview();
+    };
+    inp.click();
+  },
+  _renderImgPreview(){
+    const html = state.pendingImage ? `<img src="${state.pendingImage}"/><button onclick="App.clearImage()">移除</button>` : '';
+    ['#heroImgPreview','#imgPreview'].forEach(sel=>{ const el=$(sel); el.style.display=state.pendingImage?'flex':'none'; el.innerHTML=html; });
+  },
+  clearImage(){ state.pendingImage=null; this._renderImgPreview(); },
+
+  /* ---------- ⑧ 发送 + 流式 ---------- */
+  send(where, presetText){
+    if(state.streaming) return;
+    const inputEl = where==='hero' ? $('#heroInput') : $('#msgInput');
+    const text = (presetText!==undefined ? presetText : inputEl.value).trim();
+    const img = state.pendingImage;
+    if(!text && !img) return;
+
+    let conv=this.curConv();
+    if(!conv){ conv={id:uid(), title:text?text.slice(0,20):'图片提问', msgs:[]}; state.convs.unshift(conv); state.activeConvId=conv.id; }
+    else if(conv.msgs.length===0 && text){ conv.title=text.slice(0,20); }
+
+    conv.msgs.push({id:uid(), role:'USER', content:text, imageUrl:img});
+    if(inputEl) inputEl.value=''; this.clearImage();
+    this.renderConvs(); this.updateView(); this.renderMsgs();  // 首次提问后切换到聊天布局
+
+    const result = mockAnswer(text || '（图片）');
+    const aiMsg = {id:uid(), role:'ASSISTANT', content:'', isHighRisk:result.is_high_risk, streaming:true, fb:null};
+    conv.msgs.push(aiMsg); state.streaming=true;
+    $('#chatSendBtn') && ($('#chatSendBtn').disabled=true);
+
+    const full=result.answer; let i=0;
+    const timer=setInterval(()=>{
+      i=Math.min(full.length, i+3); aiMsg.content=full.slice(0,i); this.renderMsgs();
+      if(i>=full.length){
+        clearInterval(timer); aiMsg.streaming=false; state.streaming=false;
+        $('#chatSendBtn') && ($('#chatSendBtn').disabled=false); this.renderMsgs();
+        if(result.is_high_risk) setTimeout(()=>this.openMap('high_risk'), 400);
+        $('#msgInput') && $('#msgInput').focus();
+      }
+    }, 22);
+  },
+  feedback(id,kind){
+    const c=this.curConv(); if(!c)return;
+    const m=c.msgs.find(x=>x.id===id); if(m){ m.fb = m.fb===kind? null : kind; this.renderMsgs(); }
+  },
+
+  /* ---------- 资源地图 ---------- */
+  openMap(source){
+    const rows = MOCK_VETS.map(v=>`<div class="vet">
+        <div class="n"><span>${v.name}</span><span class="d">${v.dist<1000?v.dist+'m':(v.dist/1000).toFixed(1)+'km'}</span></div>
+        <div class="a">${v.address}</div><a class="tel" href="tel:${v.tel}">致电 ${v.tel}</a></div>`).join('');
+    $('#modalMount').innerHTML=`<div class="modal-mask" onclick="if(event.target===this)App.closeModal()">
+      <div class="modal"><div class="modal-head"><h3>附近宠物医院 / 急诊</h3><button class="x" onclick="App.closeModal()">×</button></div>
+      <div class="modal-body">
+        <div class="vet-tip">提示：以下为宠物医院搜索结果，是否能诊治异宠请务必先致电确认。</div>
+        <div style="font-size:12px;color:var(--gray-400);margin-bottom:8px">${source==='high_risk'?'（高危场景自动弹出）':''}当前展示示例数据（演示模式）</div>
+        ${rows}
+      </div></div></div>`;
+  },
+  closeModal(){ $('#modalMount').innerHTML=''; },
+
+  /* ---------- 其他 ---------- */
+  toggleSidebar(){ $('#sidebar').classList.toggle('open'); },
+  closeSidebar(){ $('#sidebar').classList.remove('open'); },
+  logout(){ location.reload(); },
+};
+
+/* 输入框回车发送 */
+document.addEventListener('keydown', e=>{
+  if(e.key==='Enter' && !e.shiftKey){
+    if(document.activeElement && document.activeElement.id==='heroInput'){ e.preventDefault(); App.send('hero'); }
+    if(document.activeElement && document.activeElement.id==='msgInput'){ e.preventDefault(); App.send('chat'); }
+  }
+});
+</script>
+</body>
+</html>

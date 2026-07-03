@@ -1,0 +1,37 @@
+{
+  "name": "yoyo-frontend-handoff",
+  "version": "0.4.0",
+  "generatedAt": "2026-07-02",
+  "entry": "index.html",
+  "sourceBaseline": "source/yoyo-prototype-final.html",
+  "runtimeAssets": [
+    {
+      "path": "assets/video/hero-yoyo.mp4",
+      "role": "landing-page background video",
+      "required": true
+    }
+  ],
+  "referenceAssets": [
+    {
+      "path": "assets/reference/design-reference.jpg",
+      "role": "visual reference only",
+      "required": false
+    }
+  ],
+  "styles": ["styles/styles.css"],
+  "scripts": ["js/config.js", "js/api.js", "js/app.js"],
+  "mockModules": [
+    "authentication",
+    "profile persistence",
+    "pet persistence",
+    "image persistence",
+    "conversations",
+    "AI response",
+    "nearby hospitals"
+  ],
+  "constraints": {
+    "maxPets": 5,
+    "maxUploadBytes": 10485760,
+    "acceptedImageTypes": ["image/jpeg", "image/png", "image/webp"]
+  }
+}
